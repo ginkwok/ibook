@@ -1,0 +1,23 @@
+server:
+  port: 8080
+  timeout: 30s
+
+db:
+  mysql:
+    host: localhost
+    port: 3306
+    username: user
+    password: pass
+    database: ibook
+
+log:
+  level: debug
+  # format: json
+  format: console
+  output: stdout
+  # output: file
+  dir: ./logs
+  file: app.log.json
+
+jwt:
+  key: secret
