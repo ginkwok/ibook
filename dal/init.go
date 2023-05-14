@@ -20,5 +20,10 @@ func GetDB(host string, port string, user string, pass string, database string) 
 		panic(err)
 	}
 
+	err = db.AutoMigrate(&model.Room{})
+	if err != nil {
+		panic(err)
+	}
+
 	return db
 }
