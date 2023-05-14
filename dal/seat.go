@@ -16,6 +16,7 @@ func GetAllSeatsOfRoom(db *gorm.DB, roomID int64) ([]*model.Seat, error) {
 }
 
 func CreateSeat(db *gorm.DB, seat *model.Seat) (*model.Seat, error) {
+	seat.ID = 0
 	err := db.Create(&seat).Error
 	if err != nil {
 		return nil, err
@@ -54,7 +55,7 @@ func GetSeatByID(db *gorm.DB, seatID int64) (*model.Seat, error) {
 
 func UpdateSeat(db *gorm.DB, seat *model.Seat) (*model.Seat, error) {
 	id := seat.ID
-	err := db.Model(&seat).Updates(seat).Error
+	err := db.Model(&seat).Save(seat).Error
 	if err != nil {
 		return nil, err
 	}

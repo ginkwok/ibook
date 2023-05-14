@@ -47,6 +47,15 @@ func main() {
 		v1.GET("/admin/rooms/:room_id/seats/:seat_id", middleware.AuthMiddleware(), handler.AdminGetSeatByIDHandler)
 		v1.PATCH("/admin/rooms/:room_id/seats/:seat_id", middleware.AuthMiddleware(), handler.AdminUpdateSeatHandler)
 
+		v1.GET("/admin/rooms/:room_id/seats/:seat_id/reservations", middleware.AuthMiddleware(), handler.AdminGetAllResvsOfSeatHandler)
+		v1.PATCH("/admin/rooms/:room_id/seats/:seat_id/reservations/:resv_id", middleware.AuthMiddleware(), handler.AdminCancelResvHandler)
+
+		v1.GET("/rooms", middleware.AuthMiddleware(), handler.GetAvailableRoomsHandler)
+
+		v1.GET("/reservations", middleware.AuthMiddleware(), handler.GetResvOfUserHandler)
+		v1.POST("/reservations", middleware.AuthMiddleware(), handler.CreateResvHandler)
+		v1.PATCH("/reservations/:resv_id", middleware.AuthMiddleware(), handler.CancelResvHandler)
+
 		v1.GET("/protected", middleware.AuthMiddleware(), func(c *gin.Context) {
 			username, _ := c.Get("username")
 			c.JSON(http.StatusOK, gin.H{"data": fmt.Sprintf("Hello, %v", username)})

@@ -15,7 +15,17 @@ func GetAllRooms(db *gorm.DB) ([]*model.Room, error) {
 	return rooms, nil
 }
 
+func GetAvailableRooms(db *gorm.DB) ([]*model.Room, error) {
+	var rooms []*model.Room
+	err := db.Where("is_avaliable = ?", true).Find(&rooms).Error
+	if err != nil {
+		return nil, err
+	}
+	return rooms, nil
+}
+
 func CreateRoom(db *gorm.DB, room *model.Room) (*model.Room, error) {
+	room.ID = 0
 	err := db.Create(&room).Error
 	if err != nil {
 		return nil, err
@@ -42,7 +52,7 @@ func GetRoomByID(db *gorm.DB, id int64) (*model.Room, error) {
 
 func UpdateRoom(db *gorm.DB, room *model.Room) (*model.Room, error) {
 	id := room.ID
-	err := db.Model(&room).Updates(room).Error
+	err := db.Model(&room).Save(&room).Error
 	if err != nil {
 		return nil, err
 	}

@@ -21,6 +21,17 @@ func GetAllRooms(ctx context.Context) ([]*model.Room, error) {
 	return rooms, nil
 }
 
+func GetAvailableRooms(ctx context.Context) ([]*model.Room, error) {
+	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
+
+	rooms, err := service.GetAvailableRooms(ctx)
+	if err != nil {
+		logger.Errorln(err)
+		return nil, err
+	}
+	return rooms, nil
+}
+
 func CreateRoom(ctx context.Context, room *model.Room) (*model.Room, error) {
 	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
 

@@ -183,3 +183,25 @@ func AdminUpdateRoomHandler(c *gin.Context) {
 
 	c.JSON(http.StatusOK, room)
 }
+
+func GetAvailableRoomsHandler(c *gin.Context) {
+	ctx := c.Request.Context()
+	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
+
+	_, ok := c.Get("username")
+	if !ok {
+		err := errors.New("invalid credentials")
+		logger.Errorln(err)
+		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		return
+	}
+
+	rooms, err := usecase.GetAvailableRooms(ctx)
+	if err != nil {
+		logger.Errorln(err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, rooms)
+}

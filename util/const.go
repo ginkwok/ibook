@@ -13,3 +13,10 @@ const (
 	PERM_OF_DIR  fs.FileMode = 0775
 	PERM_OF_FILE fs.FileMode = 0644
 )
+
+const (
+	ResvStatusUnsignin  = "unsignin"
+	ResvStatusSignined  = "signined"
+	ResvStatusSignouted = "signouted"
+	ResvStatusCancelled = "cancelled"
+)
