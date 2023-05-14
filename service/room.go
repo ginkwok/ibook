@@ -39,7 +39,13 @@ func DeleteRoom(ctx context.Context, id int64) error {
 	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
 	db := ctx.Value(util.MYSQL_KEY).(*gorm.DB)
 
-	err := dal.DeleteRoom(db, id)
+	err := DeleteSeatsOfRoom(ctx, id)
+	if err != nil {
+		logger.Errorln(err)
+		return err
+	}
+
+	err = dal.DeleteRoom(db, id)
 	if err != nil {
 		logger.Errorln(err)
 		return err
