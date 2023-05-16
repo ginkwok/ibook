@@ -188,9 +188,17 @@ func CreateResvHandler(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	resv.CreateTime = time.Now().In(loc)
+	nowtime := time.Now().In(loc)
+	resv.CreateTime = &nowtime
 
-	if !resv.CreateTime.Before(resv.ResvStartTime) || !resv.ResvStartTime.Before(resv.ResvEndTime) {
+	// if !resv.CreateTime.Before(resv.ResvStartTime) || !resv.ResvStartTime.Before(resv.ResvEndTime) {
+	// 	err := errors.New("reservation time is illegal")
+	// 	logger.Errorln(err)
+	// 	c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	// 	return
+	// }
+
+	if !resv.ResvStartTime.Before(*resv.ResvEndTime) {
 		err := errors.New("reservation time is illegal")
 		logger.Errorln(err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -251,6 +259,122 @@ func CancelResvHandler(c *gin.Context) {
 	}
 
 	resvs, err := usecase.CancelResv(ctx, resvID)
+	if err != nil {
+		logger.Errorln(err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, resvs)
+}
+
+func SigninResvHandler(c *gin.Context) {
+	ctx := c.Request.Context()
+	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
+
+	username, ok := c.Get("username")
+	if !ok {
+		err := errors.New("invalid credentials")
+		logger.Errorln(err)
+		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		return
+	}
+
+	resvIDStr := c.Param("resv_id")
+	if resvIDStr == "" {
+		err := errors.New("id is illegal")
+		logger.Errorln(err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	resvID, err := strconv.ParseInt(resvIDStr, 10, 64)
+	if err != nil {
+		logger.Errorln(err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	resv, err := usecase.GetResvByID(ctx, resvID)
+	if err != nil {
+		logger.Errorln(err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if resv.Username != username.(string) {
+		err := errors.New("reservation not belong to current user")
+		logger.Errorln(err)
+		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		return
+	}
+
+	loc, err := time.LoadLocation("Asia/Shanghai")
+	if err != nil {
+		logger.Errorln(err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	nowtime := time.Now().In(loc)
+
+	resvs, err := usecase.SigninResv(ctx, &nowtime, resvID)
+	if err != nil {
+		logger.Errorln(err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, resvs)
+}
+
+func SignoutResvHandler(c *gin.Context) {
+	ctx := c.Request.Context()
+	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
+
+	username, ok := c.Get("username")
+	if !ok {
+		err := errors.New("invalid credentials")
+		logger.Errorln(err)
+		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		return
+	}
+
+	resvIDStr := c.Param("resv_id")
+	if resvIDStr == "" {
+		err := errors.New("id is illegal")
+		logger.Errorln(err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	resvID, err := strconv.ParseInt(resvIDStr, 10, 64)
+	if err != nil {
+		logger.Errorln(err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	resv, err := usecase.GetResvByID(ctx, resvID)
+	if err != nil {
+		logger.Errorln(err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if resv.Username != username.(string) {
+		err := errors.New("reservation not belong to current user")
+		logger.Errorln(err)
+		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		return
+	}
+
+	loc, err := time.LoadLocation("Asia/Shanghai")
+	if err != nil {
+		logger.Errorln(err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	nowtime := time.Now().In(loc)
+
+	resvs, err := usecase.SignoutResv(ctx, &nowtime, resvID)
 	if err != nil {
 		logger.Errorln(err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

@@ -50,11 +50,16 @@ func main() {
 		v1.GET("/admin/rooms/:room_id/seats/:seat_id/reservations", middleware.AuthMiddleware(), handler.AdminGetAllResvsOfSeatHandler)
 		v1.PATCH("/admin/rooms/:room_id/seats/:seat_id/reservations/:resv_id", middleware.AuthMiddleware(), handler.AdminCancelResvHandler)
 
-		v1.GET("/rooms", middleware.AuthMiddleware(), handler.GetAvailableRoomsHandler)
+		v1.GET("/rooms", middleware.AuthMiddleware(), handler.GetAllRoomsHandler)
+		v1.GET("/rooms/:room_id/seats", middleware.AuthMiddleware(), handler.GetAllSeatsOfRoomHandler)
 
 		v1.GET("/reservations", middleware.AuthMiddleware(), handler.GetResvOfUserHandler)
 		v1.POST("/reservations", middleware.AuthMiddleware(), handler.CreateResvHandler)
-		v1.PATCH("/reservations/:resv_id", middleware.AuthMiddleware(), handler.CancelResvHandler)
+		v1.PATCH("/reservations/:resv_id/cancel", middleware.AuthMiddleware(), handler.CancelResvHandler)
+		v1.PATCH("/reservations/:resv_id/signin", middleware.AuthMiddleware(), handler.SigninResvHandler)
+		v1.PATCH("/reservations/:resv_id/signout", middleware.AuthMiddleware(), handler.SignoutResvHandler)
+
+		v1.GET("/search", middleware.AuthMiddleware(), handler.SearchSeatsHandler)
 
 		v1.GET("/protected", middleware.AuthMiddleware(), func(c *gin.Context) {
 			username, _ := c.Get("username")

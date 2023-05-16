@@ -255,3 +255,53 @@ func AdminUpdateSeatHandler(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, seat)
 }
+
+func GetAllSeatsOfRoomHandler(c *gin.Context) {
+	ctx := c.Request.Context()
+	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
+
+	_, ok := c.Get("username")
+	if !ok {
+		err := errors.New("invalid credentials")
+		logger.Errorln(err)
+		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		return
+	}
+
+	roomIDStr := c.Param("room_id")
+	if roomIDStr == "" {
+		err := errors.New("id is illegal")
+		logger.Errorln(err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	roomID, err := strconv.ParseInt(roomIDStr, 10, 64)
+	if err != nil {
+		logger.Errorln(err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	seats, err := usecase.GetAllSeatsOfRoom(ctx, roomID)
+	if err != nil {
+		logger.Errorln(err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, seats)
+}
+
+func SearchSeatsHandler(c *gin.Context) {
+	ctx := c.Request.Context()
+	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
+
+	seats, err := usecase.SearchSeats(ctx)
+	if err != nil {
+		logger.Errorln(err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, seats)
+}

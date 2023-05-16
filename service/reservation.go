@@ -2,6 +2,8 @@ package service
 
 import (
 	"context"
+	"errors"
+	"time"
 
 	"go.uber.org/zap"
 	"gorm.io/gorm"
@@ -69,7 +71,7 @@ func CancelResv(ctx context.Context, resvID int64) (*model.Reservation, error) {
 	return resv, nil
 }
 
-func SigninResv(ctx context.Context, resvID int64) (*model.Reservation, error) {
+func SigninResv(ctx context.Context, signinTime *time.Time, resvID int64) (*model.Reservation, error) {
 	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
 	db := ctx.Value(util.MYSQL_KEY).(*gorm.DB)
 
@@ -79,7 +81,25 @@ func SigninResv(ctx context.Context, resvID int64) (*model.Reservation, error) {
 		return nil, err
 	}
 
+	if resv.Status != util.ResvStatusUnsignin {
+		err := errors.New("reservation status error")
+		logger.Errorln(err)
+		return nil, err
+	}
+
+	if signinTime.Before(*resv.ResvStartTime) {
+		err := errors.New("reservation start time has not arrived")
+		logger.Errorln(err)
+		return nil, err
+	}
+	if signinTime.After(*resv.ResvEndTime) {
+		err := errors.New("reservation end time has passed")
+		logger.Errorln(err)
+		return nil, err
+	}
+
 	resv.Status = util.ResvStatusSignined
+	resv.SigninTime = signinTime
 
 	resv, err = dal.UpdateResv(db, resv)
 	if err != nil {
@@ -89,7 +109,7 @@ func SigninResv(ctx context.Context, resvID int64) (*model.Reservation, error) {
 	return resv, nil
 }
 
-func SignoutResv(ctx context.Context, resvID int64) (*model.Reservation, error) {
+func SignoutResv(ctx context.Context, signoutTime *time.Time, resvID int64) (*model.Reservation, error) {
 	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
 	db := ctx.Value(util.MYSQL_KEY).(*gorm.DB)
 
@@ -99,7 +119,20 @@ func SignoutResv(ctx context.Context, resvID int64) (*model.Reservation, error) 
 		return nil, err
 	}
 
+	if resv.Status != util.ResvStatusSignined {
+		err := errors.New("reservation status error")
+		logger.Errorln(err)
+		return nil, err
+	}
+
+	if signoutTime.After(*resv.ResvEndTime) {
+		err := errors.New("reservation end time has passed")
+		logger.Errorln(err)
+		return nil, err
+	}
+
 	resv.Status = util.ResvStatusSignouted
+	resv.SignoutTime = signoutTime
 
 	resv, err = dal.UpdateResv(db, resv)
 	if err != nil {

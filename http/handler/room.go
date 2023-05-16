@@ -184,7 +184,7 @@ func AdminUpdateRoomHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, room)
 }
 
-func GetAvailableRoomsHandler(c *gin.Context) {
+func GetAllRoomsHandler(c *gin.Context) {
 	ctx := c.Request.Context()
 	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
 
@@ -196,7 +196,7 @@ func GetAvailableRoomsHandler(c *gin.Context) {
 		return
 	}
 
-	rooms, err := usecase.GetAvailableRooms(ctx)
+	rooms, err := usecase.GetAllRooms(ctx)
 	if err != nil {
 		logger.Errorln(err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

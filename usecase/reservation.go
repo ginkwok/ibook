@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"time"
 
 	"go.uber.org/zap"
 
@@ -69,6 +70,28 @@ func GetResvByID(ctx context.Context, resvID int64) (*model.Reservation, error) 
 	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
 
 	resv, err := service.GetResvByID(ctx, resvID)
+	if err != nil {
+		logger.Errorln(err)
+		return nil, err
+	}
+	return resv, nil
+}
+
+func SigninResv(ctx context.Context, signinTime *time.Time, resvID int64) (*model.Reservation, error) {
+	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
+
+	resv, err := service.SigninResv(ctx, signinTime, resvID)
+	if err != nil {
+		logger.Errorln(err)
+		return nil, err
+	}
+	return resv, nil
+}
+
+func SignoutResv(ctx context.Context, signinTime *time.Time, resvID int64) (*model.Reservation, error) {
+	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
+
+	resv, err := service.SignoutResv(ctx, signinTime, resvID)
 	if err != nil {
 		logger.Errorln(err)
 		return nil, err

@@ -64,3 +64,7 @@ func UpdateSeat(ctx context.Context, seat *model.Seat) (*model.Seat, error) {
 	}
 	return seat, nil
 }
+
+func SearchSeats(ctx context.Context) ([]*model.Seat, error) {
+	return nil, nil
+}
