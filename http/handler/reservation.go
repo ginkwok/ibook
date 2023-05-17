@@ -8,12 +8,11 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/ginkwok/ibook/model"
-	"github.com/ginkwok/ibook/usecase"
 	"github.com/ginkwok/ibook/util"
 	"go.uber.org/zap"
 )
 
-func AdminGetAllResvsOfSeatHandler(c *gin.Context) {
+func (h *handlerStruct) AdminGetResvsBySeatHandler(c *gin.Context) {
 	ctx := c.Request.Context()
 	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
 
@@ -53,7 +52,7 @@ func AdminGetAllResvsOfSeatHandler(c *gin.Context) {
 		return
 	}
 
-	resvs, err := usecase.AdminGetAllResvsOfSeat(ctx, seatID)
+	resvs, err := h.svc.GetResvsBySeat(ctx, seatID)
 	if err != nil {
 		logger.Errorln(err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -63,7 +62,7 @@ func AdminGetAllResvsOfSeatHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, resvs)
 }
 
-func AdminCancelResvHandler(c *gin.Context) {
+func (h *handlerStruct) AdminCancelResvHandler(c *gin.Context) {
 	ctx := c.Request.Context()
 	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
 
@@ -117,7 +116,7 @@ func AdminCancelResvHandler(c *gin.Context) {
 		return
 	}
 
-	resv, err := usecase.AdminCancelResv(ctx, resvID)
+	resv, err := h.svc.CancelResv(ctx, resvID)
 	if err != nil {
 		logger.Errorln(err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -127,7 +126,7 @@ func AdminCancelResvHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, resv)
 }
 
-func GetResvOfUserHandler(c *gin.Context) {
+func (h *handlerStruct) GetResvsByUserHandler(c *gin.Context) {
 	ctx := c.Request.Context()
 	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
 
@@ -139,7 +138,7 @@ func GetResvOfUserHandler(c *gin.Context) {
 		return
 	}
 
-	resvs, err := usecase.GetResvOfUser(ctx, username.(string))
+	resvs, err := h.svc.GetResvsByUser(ctx, username.(string))
 	if err != nil {
 		logger.Errorln(err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -149,7 +148,7 @@ func GetResvOfUserHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, resvs)
 }
 
-func CreateResvHandler(c *gin.Context) {
+func (h *handlerStruct) CreateResvHandler(c *gin.Context) {
 	ctx := c.Request.Context()
 	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
 
@@ -209,7 +208,7 @@ func CreateResvHandler(c *gin.Context) {
 	resv.Username = username.(string)
 	resv.Status = util.ResvStatusUnsignin
 
-	resv, err = usecase.CreateResv(ctx, resv)
+	resv, err = h.svc.CreateResv(ctx, resv)
 	if err != nil {
 		logger.Errorln(err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -218,7 +217,7 @@ func CreateResvHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, resv)
 }
 
-func CancelResvHandler(c *gin.Context) {
+func (h *handlerStruct) CancelResvHandler(c *gin.Context) {
 	ctx := c.Request.Context()
 	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
 
@@ -244,7 +243,7 @@ func CancelResvHandler(c *gin.Context) {
 		return
 	}
 
-	resv, err := usecase.GetResvByID(ctx, resvID)
+	resv, err := h.svc.GetResvByID(ctx, resvID)
 	if err != nil {
 		logger.Errorln(err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -258,7 +257,7 @@ func CancelResvHandler(c *gin.Context) {
 		return
 	}
 
-	resvs, err := usecase.CancelResv(ctx, resvID)
+	resvs, err := h.svc.CancelResv(ctx, resvID)
 	if err != nil {
 		logger.Errorln(err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -268,7 +267,7 @@ func CancelResvHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, resvs)
 }
 
-func SigninResvHandler(c *gin.Context) {
+func (h *handlerStruct) SigninResvHandler(c *gin.Context) {
 	ctx := c.Request.Context()
 	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
 
@@ -294,7 +293,7 @@ func SigninResvHandler(c *gin.Context) {
 		return
 	}
 
-	resv, err := usecase.GetResvByID(ctx, resvID)
+	resv, err := h.svc.GetResvByID(ctx, resvID)
 	if err != nil {
 		logger.Errorln(err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -316,7 +315,7 @@ func SigninResvHandler(c *gin.Context) {
 	}
 	nowtime := time.Now().In(loc)
 
-	resvs, err := usecase.SigninResv(ctx, &nowtime, resvID)
+	resvs, err := h.svc.SigninResv(ctx, &nowtime, resvID)
 	if err != nil {
 		logger.Errorln(err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -326,7 +325,7 @@ func SigninResvHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, resvs)
 }
 
-func SignoutResvHandler(c *gin.Context) {
+func (h *handlerStruct) SignoutResvHandler(c *gin.Context) {
 	ctx := c.Request.Context()
 	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
 
@@ -352,7 +351,7 @@ func SignoutResvHandler(c *gin.Context) {
 		return
 	}
 
-	resv, err := usecase.GetResvByID(ctx, resvID)
+	resv, err := h.svc.GetResvByID(ctx, resvID)
 	if err != nil {
 		logger.Errorln(err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -374,7 +373,7 @@ func SignoutResvHandler(c *gin.Context) {
 	}
 	nowtime := time.Now().In(loc)
 
-	resvs, err := usecase.SignoutResv(ctx, &nowtime, resvID)
+	resvs, err := h.svc.SignoutResv(ctx, &nowtime, resvID)
 	if err != nil {
 		logger.Errorln(err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

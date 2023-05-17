@@ -4,10 +4,20 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 
+	_ "github.com/ginkwok/ibook/config"
 	"github.com/ginkwok/ibook/model"
+	"github.com/spf13/viper"
 )
 
-func GetDB(host string, port string, user string, pass string, database string) *gorm.DB {
+var DB *gorm.DB
+
+func init() {
+	host := viper.GetString("db.mysql.host")
+	port := viper.GetString("db.mysql.port")
+	user := viper.GetString("db.mysql.username")
+	pass := viper.GetString("db.mysql.password")
+	database := viper.GetString("db.mysql.database")
+
 	dsn := user + ":" + pass + "@tcp(" + host + ":" + port + ")/" + database +
 		"?charset=utf8mb4&parseTime=True&loc=Local"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
@@ -35,5 +45,9 @@ func GetDB(host string, port string, user string, pass string, database string) 
 		panic(err)
 	}
 
-	return db
+	DB = db
+}
+
+func GetDB() *gorm.DB {
+	return DB
 }

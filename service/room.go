@@ -3,87 +3,65 @@ package service
 import (
 	"context"
 
-	"go.uber.org/zap"
-	"gorm.io/gorm"
-
 	"github.com/ginkwok/ibook/dal"
 	"github.com/ginkwok/ibook/model"
-	"github.com/ginkwok/ibook/util"
 )
 
-func GetAllRooms(ctx context.Context) ([]*model.Room, error) {
-	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
-	db := ctx.Value(util.MYSQL_KEY).(*gorm.DB)
-
-	rooms, err := dal.GetAllRooms(db)
+func (s *svc) GetAllRooms(ctx context.Context) ([]*model.Room, error) {
+	rooms, err := s.dal.GetAllRooms(dal.GetDB())
 	if err != nil {
-		logger.Errorln(err)
+		s.logger.Errorln(err)
 		return nil, err
 	}
 	return rooms, nil
 }
 
-func GetAvailableRooms(ctx context.Context) ([]*model.Room, error) {
-	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
-	db := ctx.Value(util.MYSQL_KEY).(*gorm.DB)
-
-	rooms, err := dal.GetAvailableRooms(db)
+func (s *svc) GetAvailableRooms(ctx context.Context) ([]*model.Room, error) {
+	rooms, err := s.dal.GetAvailableRooms(dal.GetDB())
 	if err != nil {
-		logger.Errorln(err)
+		s.logger.Errorln(err)
 		return nil, err
 	}
 	return rooms, nil
 }
 
-func CreateRoom(ctx context.Context, room *model.Room) (*model.Room, error) {
-	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
-	db := ctx.Value(util.MYSQL_KEY).(*gorm.DB)
-
-	room, err := dal.CreateRoom(db, room)
+func (s *svc) CreateRoom(ctx context.Context, room *model.Room) (*model.Room, error) {
+	room, err := s.dal.CreateRoom(dal.GetDB(), room)
 	if err != nil {
-		logger.Errorln(err)
+		s.logger.Errorln(err)
 		return nil, err
 	}
 	return room, nil
 }
 
-func DeleteRoom(ctx context.Context, id int64) error {
-	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
-	db := ctx.Value(util.MYSQL_KEY).(*gorm.DB)
-
-	err := DeleteSeatsOfRoom(ctx, id)
+func (s *svc) DeleteRoom(ctx context.Context, id int64) error {
+	err := s.DeleteSeatsOfRoom(ctx, id)
 	if err != nil {
-		logger.Errorln(err)
+		s.logger.Errorln(err)
 		return err
 	}
 
-	err = dal.DeleteRoom(db, id)
+	err = s.dal.DeleteRoom(dal.GetDB(), id)
 	if err != nil {
-		logger.Errorln(err)
+		s.logger.Errorln(err)
 		return err
 	}
 	return nil
 }
 
-func GetRoomByID(ctx context.Context, id int64) (*model.Room, error) {
-	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
-	db := ctx.Value(util.MYSQL_KEY).(*gorm.DB)
-
-	room, err := dal.GetRoomByID(db, id)
+func (s *svc) GetRoomByID(ctx context.Context, id int64) (*model.Room, error) {
+	room, err := s.dal.GetRoomByID(dal.GetDB(), id)
 	if err != nil {
-		logger.Errorln(err)
+		s.logger.Errorln(err)
 		return nil, err
 	}
 	return room, nil
 }
 
-func UpdateRoom(ctx context.Context, room *model.Room) (*model.Room, error) {
-	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
-	db := ctx.Value(util.MYSQL_KEY).(*gorm.DB)
-
-	room, err := dal.UpdateRoom(db, room)
+func (s *svc) UpdateRoom(ctx context.Context, room *model.Room) (*model.Room, error) {
+	room, err := s.dal.UpdateRoom(dal.GetDB(), room)
 	if err != nil {
-		logger.Errorln(err)
+		s.logger.Errorln(err)
 		return nil, err
 	}
 	return room, nil

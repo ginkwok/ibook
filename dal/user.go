@@ -6,7 +6,7 @@ import (
 	"github.com/ginkwok/ibook/model"
 )
 
-func CreateUser(db *gorm.DB, user *model.User) (*model.User, error) {
+func (d *dal) CreateUser(db *gorm.DB, user *model.User) (*model.User, error) {
 	err := db.Create(&user).Error
 	if err != nil {
 		return nil, err
@@ -14,7 +14,7 @@ func CreateUser(db *gorm.DB, user *model.User) (*model.User, error) {
 	return user, nil
 }
 
-func GetUserByName(db *gorm.DB, username string) (*model.User, error) {
+func (d *dal) GetUserByName(db *gorm.DB, username string) (*model.User, error) {
 	var user *model.User
 	err := db.Where("username = ?", username).First(&user).Error
 	if err != nil {
@@ -23,7 +23,7 @@ func GetUserByName(db *gorm.DB, username string) (*model.User, error) {
 	return user, nil
 }
 
-func CheckUser(db *gorm.DB, username string, password string) (bool, error) {
+func (d *dal) CheckUser(db *gorm.DB, username string, password string) (bool, error) {
 	var user *model.User
 	err := db.Where("username = ?", username).First(&user).Error
 	if err != nil {

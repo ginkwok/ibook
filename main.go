@@ -11,6 +11,7 @@ import (
 	"github.com/ginkwok/ibook/dal"
 	"github.com/ginkwok/ibook/http/handler"
 	"github.com/ginkwok/ibook/http/middleware"
+	"github.com/ginkwok/ibook/service"
 	"github.com/ginkwok/ibook/util"
 )
 
@@ -18,48 +19,44 @@ func main() {
 	logger := util.NewLogger()
 	defer logger.Sync()
 
-	db := dal.GetDB(
-		viper.GetString("db.mysql.host"),
-		viper.GetString("db.mysql.port"),
-		viper.GetString("db.mysql.username"),
-		viper.GetString("db.mysql.password"),
-		viper.GetString("db.mysql.database"),
-	)
+	dalClient := dal.GetDal(dal.GetDB())
+
+	svc := service.NewService(dalClient, logger)
+
+	httpHandler := handler.NewHandler(svc)
 
 	router := gin.Default()
-	router.Use(middleware.LoggerMiddleware(logger))
-	router.Use(middleware.MySQLMiddleware(db))
 
 	v1 := router.Group("api/v1")
 	{
-		v1.POST("/register", handler.RegisterHandler)
-		v1.POST("/login", handler.LoginHandler)
+		v1.POST("/register", httpHandler.RegisterHandler)
+		v1.POST("/login", httpHandler.LoginHandler)
 
-		v1.GET("/admin/rooms", middleware.AuthMiddleware(), handler.AdminGetAllRoomsHandler)
-		v1.POST("/admin/rooms", middleware.AuthMiddleware(), handler.AdminCreateRoomHandler)
-		v1.DELETE("/admin/rooms/:room_id", middleware.AuthMiddleware(), handler.AdminDeleteRoomHandler)
-		v1.GET("/admin/rooms/:room_id", middleware.AuthMiddleware(), handler.AdminGetRoomByIDHandler)
-		v1.PATCH("/admin/rooms/:room_id", middleware.AuthMiddleware(), handler.AdminUpdateRoomHandler)
+		v1.GET("/admin/rooms", middleware.AuthMiddleware(), httpHandler.AdminGetAllRoomsHandler)
+		v1.POST("/admin/rooms", middleware.AuthMiddleware(), httpHandler.AdminCreateRoomHandler)
+		v1.DELETE("/admin/rooms/:room_id", middleware.AuthMiddleware(), httpHandler.AdminDeleteRoomHandler)
+		v1.GET("/admin/rooms/:room_id", middleware.AuthMiddleware(), httpHandler.AdminGetRoomByIDHandler)
+		v1.PATCH("/admin/rooms/:room_id", middleware.AuthMiddleware(), httpHandler.AdminUpdateRoomHandler)
 
-		v1.GET("/admin/rooms/:room_id/seats", middleware.AuthMiddleware(), handler.AdminGetAllSeatsOfRoomHandler)
-		v1.POST("/admin/rooms/:room_id/seats", middleware.AuthMiddleware(), handler.AdminCreateSeatsHandler)
-		v1.DELETE("/admin/rooms/:room_id/seats/:seat_id", middleware.AuthMiddleware(), handler.AdminDeleteSeatHandler)
-		v1.GET("/admin/rooms/:room_id/seats/:seat_id", middleware.AuthMiddleware(), handler.AdminGetSeatByIDHandler)
-		v1.PATCH("/admin/rooms/:room_id/seats/:seat_id", middleware.AuthMiddleware(), handler.AdminUpdateSeatHandler)
+		v1.GET("/admin/rooms/:room_id/seats", middleware.AuthMiddleware(), httpHandler.AdminGetAllSeatsOfRoomHandler)
+		v1.POST("/admin/rooms/:room_id/seats", middleware.AuthMiddleware(), httpHandler.AdminCreateSeatsHandler)
+		v1.DELETE("/admin/rooms/:room_id/seats/:seat_id", middleware.AuthMiddleware(), httpHandler.AdminDeleteSeatHandler)
+		v1.GET("/admin/rooms/:room_id/seats/:seat_id", middleware.AuthMiddleware(), httpHandler.AdminGetSeatByIDHandler)
+		v1.PATCH("/admin/rooms/:room_id/seats/:seat_id", middleware.AuthMiddleware(), httpHandler.AdminUpdateSeatHandler)
 
-		v1.GET("/admin/rooms/:room_id/seats/:seat_id/reservations", middleware.AuthMiddleware(), handler.AdminGetAllResvsOfSeatHandler)
-		v1.PATCH("/admin/rooms/:room_id/seats/:seat_id/reservations/:resv_id", middleware.AuthMiddleware(), handler.AdminCancelResvHandler)
+		v1.GET("/admin/rooms/:room_id/seats/:seat_id/reservations", middleware.AuthMiddleware(), httpHandler.AdminGetResvsBySeatHandler)
+		v1.PATCH("/admin/rooms/:room_id/seats/:seat_id/reservations/:resv_id", middleware.AuthMiddleware(), httpHandler.AdminCancelResvHandler)
 
-		v1.GET("/rooms", middleware.AuthMiddleware(), handler.GetAllRoomsHandler)
-		v1.GET("/rooms/:room_id/seats", middleware.AuthMiddleware(), handler.GetAllSeatsOfRoomHandler)
+		v1.GET("/rooms", middleware.AuthMiddleware(), httpHandler.GetAllRoomsHandler)
+		v1.GET("/rooms/:room_id/seats", middleware.AuthMiddleware(), httpHandler.GetAllSeatsOfRoomHandler)
 
-		v1.GET("/reservations", middleware.AuthMiddleware(), handler.GetResvOfUserHandler)
-		v1.POST("/reservations", middleware.AuthMiddleware(), handler.CreateResvHandler)
-		v1.PATCH("/reservations/:resv_id/cancel", middleware.AuthMiddleware(), handler.CancelResvHandler)
-		v1.PATCH("/reservations/:resv_id/signin", middleware.AuthMiddleware(), handler.SigninResvHandler)
-		v1.PATCH("/reservations/:resv_id/signout", middleware.AuthMiddleware(), handler.SignoutResvHandler)
+		v1.GET("/reservations", middleware.AuthMiddleware(), httpHandler.GetResvsByUserHandler)
+		v1.POST("/reservations", middleware.AuthMiddleware(), httpHandler.CreateResvHandler)
+		v1.PATCH("/reservations/:resv_id/cancel", middleware.AuthMiddleware(), httpHandler.CancelResvHandler)
+		v1.PATCH("/reservations/:resv_id/signin", middleware.AuthMiddleware(), httpHandler.SigninResvHandler)
+		v1.PATCH("/reservations/:resv_id/signout", middleware.AuthMiddleware(), httpHandler.SignoutResvHandler)
 
-		v1.GET("/search", middleware.AuthMiddleware(), handler.SearchSeatsHandler)
+		v1.GET("/search", middleware.AuthMiddleware(), httpHandler.SearchSeatsHandler)
 
 		v1.GET("/protected", middleware.AuthMiddleware(), func(c *gin.Context) {
 			username, _ := c.Get("username")

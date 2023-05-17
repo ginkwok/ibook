@@ -6,20 +6,20 @@ import (
 	"github.com/ginkwok/ibook/model"
 )
 
-func CreateResv(db *gorm.DB, resv *model.Reservation) (*model.Reservation, error) {
+func (d *dal) CreateResv(db *gorm.DB, resv *model.Reservation) (*model.Reservation, error) {
 	resv.ID = 0
 	err := db.Create(&resv).Error
 	if err != nil {
 		return nil, err
 	}
-	resv, err = GetResvByID(db, resv.ID)
+	resv, err = d.GetResvByID(db, resv.ID)
 	if err != nil {
 		return nil, err
 	}
 	return resv, nil
 }
 
-func GetResvByID(db *gorm.DB, resvID int64) (*model.Reservation, error) {
+func (d *dal) GetResvByID(db *gorm.DB, resvID int64) (*model.Reservation, error) {
 	var resv *model.Reservation
 	err := db.First(&resv, resvID).Error
 	if err != nil {
@@ -28,7 +28,7 @@ func GetResvByID(db *gorm.DB, resvID int64) (*model.Reservation, error) {
 	return resv, nil
 }
 
-func GetResvsBySeat(db *gorm.DB, seatID int64) ([]*model.Reservation, error) {
+func (d *dal) GetResvsBySeat(db *gorm.DB, seatID int64) ([]*model.Reservation, error) {
 	var resvs []*model.Reservation
 	err := db.Where("seat_id = ?", seatID).Find(&resvs).Error
 	if err != nil {
@@ -37,7 +37,7 @@ func GetResvsBySeat(db *gorm.DB, seatID int64) ([]*model.Reservation, error) {
 	return resvs, nil
 }
 
-func GetResvsByUser(db *gorm.DB, username string) ([]*model.Reservation, error) {
+func (d *dal) GetResvsByUser(db *gorm.DB, username string) ([]*model.Reservation, error) {
 	var resvs []*model.Reservation
 	err := db.Where("username = ?", username).Find(&resvs).Error
 	if err != nil {
@@ -46,13 +46,13 @@ func GetResvsByUser(db *gorm.DB, username string) ([]*model.Reservation, error) 
 	return resvs, nil
 }
 
-func UpdateResv(db *gorm.DB, resv *model.Reservation) (*model.Reservation, error) {
+func (d *dal) UpdateResv(db *gorm.DB, resv *model.Reservation) (*model.Reservation, error) {
 	id := resv.ID
 	err := db.Model(&resv).Updates(resv).Error
 	if err != nil {
 		return nil, err
 	}
-	resv, err = GetResvByID(db, id)
+	resv, err = d.GetResvByID(db, id)
 	if err != nil {
 		return nil, err
 	}

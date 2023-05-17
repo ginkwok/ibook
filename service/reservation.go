@@ -5,150 +5,131 @@ import (
 	"errors"
 	"time"
 
-	"go.uber.org/zap"
-	"gorm.io/gorm"
-
 	"github.com/ginkwok/ibook/dal"
 	"github.com/ginkwok/ibook/model"
 	"github.com/ginkwok/ibook/util"
 )
 
-func GetResvsBySeat(ctx context.Context, seatID int64) ([]*model.Reservation, error) {
-	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
-	db := ctx.Value(util.MYSQL_KEY).(*gorm.DB)
-
-	resvs, err := dal.GetResvsBySeat(db, seatID)
+func (s *svc) GetResvsBySeat(ctx context.Context, seatID int64) ([]*model.Reservation, error) {
+	resvs, err := s.dal.GetResvsBySeat(dal.GetDB(), seatID)
 	if err != nil {
-		logger.Errorln(err)
+		s.logger.Errorln(err)
 		return nil, err
 	}
 	return resvs, nil
 }
 
-func GetResvsOfUser(ctx context.Context, username string) ([]*model.Reservation, error) {
-	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
-	db := ctx.Value(util.MYSQL_KEY).(*gorm.DB)
+func (s *svc) GetResvsByUser(ctx context.Context, username string) ([]*model.Reservation, error) {
 
-	resvs, err := dal.GetResvsByUser(db, username)
+	resvs, err := s.dal.GetResvsByUser(dal.GetDB(), username)
 	if err != nil {
-		logger.Errorln(err)
+		s.logger.Errorln(err)
 		return nil, err
 	}
 	return resvs, nil
 }
 
-func CreateResv(ctx context.Context, resv *model.Reservation) (*model.Reservation, error) {
-	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
-	db := ctx.Value(util.MYSQL_KEY).(*gorm.DB)
+func (s *svc) CreateResv(ctx context.Context, resv *model.Reservation) (*model.Reservation, error) {
 
 	resv.Status = util.ResvStatusUnsignin
 
-	resv, err := dal.CreateResv(db, resv)
+	resv, err := s.dal.CreateResv(dal.GetDB(), resv)
 	if err != nil {
-		logger.Errorln(err)
+		s.logger.Errorln(err)
 		return nil, err
 	}
 	return resv, nil
 }
 
-func CancelResv(ctx context.Context, resvID int64) (*model.Reservation, error) {
-	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
-	db := ctx.Value(util.MYSQL_KEY).(*gorm.DB)
+func (s *svc) CancelResv(ctx context.Context, resvID int64) (*model.Reservation, error) {
 
-	resv, err := dal.GetResvByID(db, resvID)
+	resv, err := s.dal.GetResvByID(dal.GetDB(), resvID)
 	if err != nil {
-		logger.Errorln(err)
+		s.logger.Errorln(err)
 		return nil, err
 	}
 
 	resv.Status = util.ResvStatusCancelled
 
-	resv, err = dal.UpdateResv(db, resv)
+	resv, err = s.dal.UpdateResv(dal.GetDB(), resv)
 	if err != nil {
-		logger.Errorln(err)
+		s.logger.Errorln(err)
 		return nil, err
 	}
 	return resv, nil
 }
 
-func SigninResv(ctx context.Context, signinTime *time.Time, resvID int64) (*model.Reservation, error) {
-	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
-	db := ctx.Value(util.MYSQL_KEY).(*gorm.DB)
+func (s *svc) SigninResv(ctx context.Context, signinTime *time.Time, resvID int64) (*model.Reservation, error) {
 
-	resv, err := dal.GetResvByID(db, resvID)
+	resv, err := s.dal.GetResvByID(dal.GetDB(), resvID)
 	if err != nil {
-		logger.Errorln(err)
+		s.logger.Errorln(err)
 		return nil, err
 	}
 
 	if resv.Status != util.ResvStatusUnsignin {
 		err := errors.New("reservation status error")
-		logger.Errorln(err)
+		s.logger.Errorln(err)
 		return nil, err
 	}
 
 	if signinTime.Before(*resv.ResvStartTime) {
 		err := errors.New("reservation start time has not arrived")
-		logger.Errorln(err)
+		s.logger.Errorln(err)
 		return nil, err
 	}
 	if signinTime.After(*resv.ResvEndTime) {
 		err := errors.New("reservation end time has passed")
-		logger.Errorln(err)
+		s.logger.Errorln(err)
 		return nil, err
 	}
 
 	resv.Status = util.ResvStatusSignined
 	resv.SigninTime = signinTime
 
-	resv, err = dal.UpdateResv(db, resv)
+	resv, err = s.dal.UpdateResv(dal.GetDB(), resv)
 	if err != nil {
-		logger.Errorln(err)
+		s.logger.Errorln(err)
 		return nil, err
 	}
 	return resv, nil
 }
 
-func SignoutResv(ctx context.Context, signoutTime *time.Time, resvID int64) (*model.Reservation, error) {
-	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
-	db := ctx.Value(util.MYSQL_KEY).(*gorm.DB)
-
-	resv, err := dal.GetResvByID(db, resvID)
+func (s *svc) SignoutResv(ctx context.Context, signoutTime *time.Time, resvID int64) (*model.Reservation, error) {
+	resv, err := s.dal.GetResvByID(dal.GetDB(), resvID)
 	if err != nil {
-		logger.Errorln(err)
+		s.logger.Errorln(err)
 		return nil, err
 	}
 
 	if resv.Status != util.ResvStatusSignined {
 		err := errors.New("reservation status error")
-		logger.Errorln(err)
+		s.logger.Errorln(err)
 		return nil, err
 	}
 
 	if signoutTime.After(*resv.ResvEndTime) {
 		err := errors.New("reservation end time has passed")
-		logger.Errorln(err)
+		s.logger.Errorln(err)
 		return nil, err
 	}
 
 	resv.Status = util.ResvStatusSignouted
 	resv.SignoutTime = signoutTime
 
-	resv, err = dal.UpdateResv(db, resv)
+	resv, err = s.dal.UpdateResv(dal.GetDB(), resv)
 	if err != nil {
-		logger.Errorln(err)
+		s.logger.Errorln(err)
 		return nil, err
 	}
 	return resv, nil
 }
 
-func GetResvByID(ctx context.Context, resvID int64) (*model.Reservation, error) {
-	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
-	db := ctx.Value(util.MYSQL_KEY).(*gorm.DB)
+func (s *svc) GetResvByID(ctx context.Context, resvID int64) (*model.Reservation, error) {
 
-	resv, err := dal.GetResvByID(db, resvID)
+	resv, err := s.dal.GetResvByID(dal.GetDB(), resvID)
 	if err != nil {
-		logger.Errorln(err)
+		s.logger.Errorln(err)
 		return nil, err
 	}
 	return resv, nil

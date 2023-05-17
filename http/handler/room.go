@@ -9,11 +9,10 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/ginkwok/ibook/model"
-	"github.com/ginkwok/ibook/usecase"
 	"github.com/ginkwok/ibook/util"
 )
 
-func AdminGetAllRoomsHandler(c *gin.Context) {
+func (h *handlerStruct) AdminGetAllRoomsHandler(c *gin.Context) {
 	ctx := c.Request.Context()
 	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
 
@@ -25,7 +24,7 @@ func AdminGetAllRoomsHandler(c *gin.Context) {
 		return
 	}
 
-	rooms, err := usecase.GetAllRooms(ctx)
+	rooms, err := h.svc.GetAllRooms(ctx)
 	if err != nil {
 		logger.Errorln(err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -35,30 +34,31 @@ func AdminGetAllRoomsHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, rooms)
 }
 
-func AdminCreateRoomHandler(c *gin.Context) {
+func (h *handlerStruct) AdminCreateRoomHandler(c *gin.Context) {
 	ctx := c.Request.Context()
-	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
+	// logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
 
-	_, ok := c.Get("username")
-	if !ok {
-		err := errors.New("invalid credentials")
-		logger.Errorln(err)
-		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
-		return
-	}
+	// _, ok := c.Get("username")
+	// if !ok {
+	// 	err := errors.New("invalid credentials")
+	// 	logger.Errorln(err)
+	// 	c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+	// 	return
+	// }
 
 	var room *model.Room
 	if err := c.ShouldBindJSON(&room); err != nil {
-		logger.Errorln(err)
+		// logger.Errorln(err)
+		panic(err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	room.ID = 0
 
-	room, err := usecase.CreateRoom(ctx, room)
+	room, err := h.svc.CreateRoom(ctx, room)
 	if err != nil {
-		logger.Errorln(err)
+		// logger.Errorln(err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -66,7 +66,7 @@ func AdminCreateRoomHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, room)
 }
 
-func AdminDeleteRoomHandler(c *gin.Context) {
+func (h *handlerStruct) AdminDeleteRoomHandler(c *gin.Context) {
 	ctx := c.Request.Context()
 	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
 
@@ -92,7 +92,7 @@ func AdminDeleteRoomHandler(c *gin.Context) {
 		return
 	}
 
-	err = usecase.DeleteRoom(ctx, id)
+	err = h.svc.DeleteRoom(ctx, id)
 	if err != nil {
 		logger.Errorln(err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -102,7 +102,7 @@ func AdminDeleteRoomHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, nil)
 }
 
-func AdminGetRoomByIDHandler(c *gin.Context) {
+func (h *handlerStruct) AdminGetRoomByIDHandler(c *gin.Context) {
 	ctx := c.Request.Context()
 	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
 
@@ -128,7 +128,7 @@ func AdminGetRoomByIDHandler(c *gin.Context) {
 		return
 	}
 
-	room, err := usecase.GetRoomByID(ctx, id)
+	room, err := h.svc.GetRoomByID(ctx, id)
 	if err != nil {
 		logger.Errorln(err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -138,7 +138,7 @@ func AdminGetRoomByIDHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, room)
 }
 
-func AdminUpdateRoomHandler(c *gin.Context) {
+func (h *handlerStruct) AdminUpdateRoomHandler(c *gin.Context) {
 	ctx := c.Request.Context()
 	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
 
@@ -174,7 +174,7 @@ func AdminUpdateRoomHandler(c *gin.Context) {
 
 	room.ID = id
 
-	room, err = usecase.UpdateRoom(ctx, room)
+	room, err = h.svc.UpdateRoom(ctx, room)
 	if err != nil {
 		logger.Errorln(err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -184,7 +184,7 @@ func AdminUpdateRoomHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, room)
 }
 
-func GetAllRoomsHandler(c *gin.Context) {
+func (h *handlerStruct) GetAllRoomsHandler(c *gin.Context) {
 	ctx := c.Request.Context()
 	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
 
@@ -196,7 +196,7 @@ func GetAllRoomsHandler(c *gin.Context) {
 		return
 	}
 
-	rooms, err := usecase.GetAllRooms(ctx)
+	rooms, err := h.svc.GetAllRooms(ctx)
 	if err != nil {
 		logger.Errorln(err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

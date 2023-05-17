@@ -9,11 +9,10 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/ginkwok/ibook/model"
-	"github.com/ginkwok/ibook/usecase"
 	"github.com/ginkwok/ibook/util"
 )
 
-func AdminGetAllSeatsOfRoomHandler(c *gin.Context) {
+func (h *handlerStruct) AdminGetAllSeatsOfRoomHandler(c *gin.Context) {
 	ctx := c.Request.Context()
 	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
 
@@ -39,7 +38,7 @@ func AdminGetAllSeatsOfRoomHandler(c *gin.Context) {
 		return
 	}
 
-	seats, err := usecase.GetAllSeatsOfRoom(ctx, roomID)
+	seats, err := h.svc.GetAllSeatsOfRoom(ctx, roomID)
 	if err != nil {
 		logger.Errorln(err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -49,7 +48,7 @@ func AdminGetAllSeatsOfRoomHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, seats)
 }
 
-func AdminCreateSeatsHandler(c *gin.Context) {
+func (h *handlerStruct) AdminCreateSeatsHandler(c *gin.Context) {
 	ctx := c.Request.Context()
 	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
 
@@ -87,7 +86,7 @@ func AdminCreateSeatsHandler(c *gin.Context) {
 		v.RoomID = roomID
 	}
 
-	err = usecase.CreateSeats(ctx, seats)
+	err = h.svc.CreateSeats(ctx, seats)
 	if err != nil {
 		logger.Errorln(err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -97,7 +96,7 @@ func AdminCreateSeatsHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, nil)
 }
 
-func AdminDeleteSeatHandler(c *gin.Context) {
+func (h *handlerStruct) AdminDeleteSeatHandler(c *gin.Context) {
 	ctx := c.Request.Context()
 	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
 
@@ -137,7 +136,7 @@ func AdminDeleteSeatHandler(c *gin.Context) {
 		return
 	}
 
-	err = usecase.DeleteSeat(ctx, seatID)
+	err = h.svc.DeleteSeat(ctx, seatID)
 	if err != nil {
 		logger.Errorln(err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -147,7 +146,7 @@ func AdminDeleteSeatHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, nil)
 }
 
-func AdminGetSeatByIDHandler(c *gin.Context) {
+func (h *handlerStruct) AdminGetSeatByIDHandler(c *gin.Context) {
 	ctx := c.Request.Context()
 	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
 
@@ -187,7 +186,7 @@ func AdminGetSeatByIDHandler(c *gin.Context) {
 		return
 	}
 
-	seat, err := usecase.GetSeatByID(ctx, seatID)
+	seat, err := h.svc.GetSeatByID(ctx, seatID)
 	if err != nil {
 		logger.Errorln(err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -197,7 +196,7 @@ func AdminGetSeatByIDHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, seat)
 }
 
-func AdminUpdateSeatHandler(c *gin.Context) {
+func (h *handlerStruct) AdminUpdateSeatHandler(c *gin.Context) {
 	ctx := c.Request.Context()
 	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
 
@@ -247,7 +246,7 @@ func AdminUpdateSeatHandler(c *gin.Context) {
 	seat.ID = seatID
 	seat.RoomID = roomID
 
-	seat, err = usecase.UpdateSeat(ctx, seat)
+	seat, err = h.svc.UpdateSeat(ctx, seat)
 	if err != nil {
 		logger.Errorln(err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -256,7 +255,7 @@ func AdminUpdateSeatHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, seat)
 }
 
-func GetAllSeatsOfRoomHandler(c *gin.Context) {
+func (h *handlerStruct) GetAllSeatsOfRoomHandler(c *gin.Context) {
 	ctx := c.Request.Context()
 	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
 
@@ -282,7 +281,7 @@ func GetAllSeatsOfRoomHandler(c *gin.Context) {
 		return
 	}
 
-	seats, err := usecase.GetAllSeatsOfRoom(ctx, roomID)
+	seats, err := h.svc.GetAllSeatsOfRoom(ctx, roomID)
 	if err != nil {
 		logger.Errorln(err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -292,11 +291,11 @@ func GetAllSeatsOfRoomHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, seats)
 }
 
-func SearchSeatsHandler(c *gin.Context) {
+func (h *handlerStruct) SearchSeatsHandler(c *gin.Context) {
 	ctx := c.Request.Context()
 	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
 
-	seats, err := usecase.SearchSeats(ctx)
+	seats, err := h.svc.SearchSeats(ctx)
 	if err != nil {
 		logger.Errorln(err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
