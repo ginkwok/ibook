@@ -19,13 +19,16 @@ func main() {
 	logger := util.NewLogger()
 	defer logger.Sync()
 
-	dalClient := dal.GetDal(dal.GetDB())
+	db := dal.GetDB()
+	dalClient := dal.GetDal(db)
 
 	svc := service.NewService(dalClient, logger)
 
 	httpHandler := handler.NewHandler(svc)
 
 	router := gin.Default()
+	router.Use(middleware.LoggerMiddleware(logger))
+	router.Use(middleware.MySQLMiddleware(db))
 
 	v1 := router.Group("api/v1")
 	{
