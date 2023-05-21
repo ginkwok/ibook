@@ -12,7 +12,7 @@ import (
 	"go.uber.org/zap"
 )
 
-func (h *handlerStruct) AdminGetResvsBySeatHandler(c *gin.Context) {
+func (h *HandlerStruct) AdminGetResvsBySeatHandler(c *gin.Context) {
 	ctx := c.Request.Context()
 	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
 
@@ -62,7 +62,7 @@ func (h *handlerStruct) AdminGetResvsBySeatHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, resvs)
 }
 
-func (h *handlerStruct) AdminCancelResvHandler(c *gin.Context) {
+func (h *HandlerStruct) AdminCancelResvHandler(c *gin.Context) {
 	ctx := c.Request.Context()
 	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
 
@@ -126,7 +126,7 @@ func (h *handlerStruct) AdminCancelResvHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, resv)
 }
 
-func (h *handlerStruct) GetResvsByUserHandler(c *gin.Context) {
+func (h *HandlerStruct) GetResvsByUserHandler(c *gin.Context) {
 	ctx := c.Request.Context()
 	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
 
@@ -148,7 +148,7 @@ func (h *handlerStruct) GetResvsByUserHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, resvs)
 }
 
-func (h *handlerStruct) CreateResvHandler(c *gin.Context) {
+func (h *HandlerStruct) CreateResvHandler(c *gin.Context) {
 	ctx := c.Request.Context()
 	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
 
@@ -217,7 +217,7 @@ func (h *handlerStruct) CreateResvHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, resv)
 }
 
-func (h *handlerStruct) CancelResvHandler(c *gin.Context) {
+func (h *HandlerStruct) CancelResvHandler(c *gin.Context) {
 	ctx := c.Request.Context()
 	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
 
@@ -267,7 +267,7 @@ func (h *handlerStruct) CancelResvHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, resvs)
 }
 
-func (h *handlerStruct) SigninResvHandler(c *gin.Context) {
+func (h *HandlerStruct) SigninResvHandler(c *gin.Context) {
 	ctx := c.Request.Context()
 	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
 
@@ -325,7 +325,7 @@ func (h *handlerStruct) SigninResvHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, resvs)
 }
 
-func (h *handlerStruct) SignoutResvHandler(c *gin.Context) {
+func (h *HandlerStruct) SignoutResvHandler(c *gin.Context) {
 	ctx := c.Request.Context()
 	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
 

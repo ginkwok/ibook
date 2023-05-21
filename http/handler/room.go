@@ -12,7 +12,7 @@ import (
 	"github.com/ginkwok/ibook/util"
 )
 
-func (h *handlerStruct) AdminGetAllRoomsHandler(c *gin.Context) {
+func (h *HandlerStruct) AdminGetAllRoomsHandler(c *gin.Context) {
 	ctx := c.Request.Context()
 	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
 
@@ -34,22 +34,21 @@ func (h *handlerStruct) AdminGetAllRoomsHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, rooms)
 }
 
-func (h *handlerStruct) AdminCreateRoomHandler(c *gin.Context) {
+func (h *HandlerStruct) AdminCreateRoomHandler(c *gin.Context) {
 	ctx := c.Request.Context()
-	// logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
+	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
 
-	// _, ok := c.Get("username")
-	// if !ok {
-	// 	err := errors.New("invalid credentials")
-	// 	logger.Errorln(err)
-	// 	c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
-	// 	return
-	// }
+	_, ok := c.Get("username")
+	if !ok {
+		err := errors.New("invalid credentials")
+		logger.Errorln(err)
+		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		return
+	}
 
 	var room *model.Room
 	if err := c.ShouldBindJSON(&room); err != nil {
-		// logger.Errorln(err)
-		panic(err)
+		logger.Errorln(err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -58,7 +57,7 @@ func (h *handlerStruct) AdminCreateRoomHandler(c *gin.Context) {
 
 	room, err := h.svc.CreateRoom(ctx, room)
 	if err != nil {
-		// logger.Errorln(err)
+		logger.Errorln(err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -66,7 +65,7 @@ func (h *handlerStruct) AdminCreateRoomHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, room)
 }
 
-func (h *handlerStruct) AdminDeleteRoomHandler(c *gin.Context) {
+func (h *HandlerStruct) AdminDeleteRoomHandler(c *gin.Context) {
 	ctx := c.Request.Context()
 	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
 
@@ -102,7 +101,7 @@ func (h *handlerStruct) AdminDeleteRoomHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, nil)
 }
 
-func (h *handlerStruct) AdminGetRoomByIDHandler(c *gin.Context) {
+func (h *HandlerStruct) AdminGetRoomByIDHandler(c *gin.Context) {
 	ctx := c.Request.Context()
 	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
 
@@ -138,7 +137,7 @@ func (h *handlerStruct) AdminGetRoomByIDHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, room)
 }
 
-func (h *handlerStruct) AdminUpdateRoomHandler(c *gin.Context) {
+func (h *HandlerStruct) AdminUpdateRoomHandler(c *gin.Context) {
 	ctx := c.Request.Context()
 	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
 
@@ -184,7 +183,7 @@ func (h *handlerStruct) AdminUpdateRoomHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, room)
 }
 
-func (h *handlerStruct) GetAllRoomsHandler(c *gin.Context) {
+func (h *HandlerStruct) GetAllRoomsHandler(c *gin.Context) {
 	ctx := c.Request.Context()
 	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
 

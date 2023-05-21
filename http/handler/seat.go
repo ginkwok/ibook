@@ -12,7 +12,7 @@ import (
 	"github.com/ginkwok/ibook/util"
 )
 
-func (h *handlerStruct) AdminGetAllSeatsOfRoomHandler(c *gin.Context) {
+func (h *HandlerStruct) AdminGetAllSeatsOfRoomHandler(c *gin.Context) {
 	ctx := c.Request.Context()
 	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
 
@@ -48,7 +48,53 @@ func (h *handlerStruct) AdminGetAllSeatsOfRoomHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, seats)
 }
 
-func (h *handlerStruct) AdminCreateSeatsHandler(c *gin.Context) {
+func (h *HandlerStruct) AdminCreateSeatHandler(c *gin.Context) {
+	ctx := c.Request.Context()
+	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
+
+	_, ok := c.Get("username")
+	if !ok {
+		err := errors.New("invalid credentials")
+		logger.Errorln(err)
+		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		return
+	}
+
+	roomIDStr := c.Param("room_id")
+	if roomIDStr == "" {
+		err := errors.New("id is illegal")
+		logger.Errorln(err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	roomID, err := strconv.ParseInt(roomIDStr, 10, 64)
+	if err != nil {
+		logger.Errorln(err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	var seat *model.Seat
+	if err := c.ShouldBindJSON(&seat); err != nil {
+		logger.Errorln(err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	seat.ID = 0
+	seat.RoomID = roomID
+
+	seat, err = h.svc.CreateSeat(ctx, seat)
+	if err != nil {
+		logger.Errorln(err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, seat)
+}
+
+func (h *HandlerStruct) AdminCreateSeatsHandler(c *gin.Context) {
 	ctx := c.Request.Context()
 	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
 
@@ -96,7 +142,7 @@ func (h *handlerStruct) AdminCreateSeatsHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, nil)
 }
 
-func (h *handlerStruct) AdminDeleteSeatHandler(c *gin.Context) {
+func (h *HandlerStruct) AdminDeleteSeatHandler(c *gin.Context) {
 	ctx := c.Request.Context()
 	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
 
@@ -146,7 +192,7 @@ func (h *handlerStruct) AdminDeleteSeatHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, nil)
 }
 
-func (h *handlerStruct) AdminGetSeatByIDHandler(c *gin.Context) {
+func (h *HandlerStruct) AdminGetSeatByIDHandler(c *gin.Context) {
 	ctx := c.Request.Context()
 	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
 
@@ -196,7 +242,7 @@ func (h *handlerStruct) AdminGetSeatByIDHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, seat)
 }
 
-func (h *handlerStruct) AdminUpdateSeatHandler(c *gin.Context) {
+func (h *HandlerStruct) AdminUpdateSeatHandler(c *gin.Context) {
 	ctx := c.Request.Context()
 	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
 
@@ -255,7 +301,7 @@ func (h *handlerStruct) AdminUpdateSeatHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, seat)
 }
 
-func (h *handlerStruct) GetAllSeatsOfRoomHandler(c *gin.Context) {
+func (h *HandlerStruct) GetAllSeatsOfRoomHandler(c *gin.Context) {
 	ctx := c.Request.Context()
 	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
 
@@ -291,7 +337,7 @@ func (h *handlerStruct) GetAllSeatsOfRoomHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, seats)
 }
 
-func (h *handlerStruct) SearchSeatsHandler(c *gin.Context) {
+func (h *HandlerStruct) SearchSeatsHandler(c *gin.Context) {
 	ctx := c.Request.Context()
 	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
 

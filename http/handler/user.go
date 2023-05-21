@@ -15,7 +15,7 @@ import (
 	"github.com/ginkwok/ibook/util"
 )
 
-func (h *handlerStruct) RegisterHandler(c *gin.Context) {
+func (h *HandlerStruct) RegisterHandler(c *gin.Context) {
 	ctx := c.Request.Context()
 	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
 
@@ -42,7 +42,7 @@ func (h *handlerStruct) RegisterHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "user created", "token": token})
 }
 
-func (h *handlerStruct) LoginHandler(c *gin.Context) {
+func (h *HandlerStruct) LoginHandler(c *gin.Context) {
 	ctx := c.Request.Context()
 	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
 
@@ -90,7 +90,7 @@ func (h *handlerStruct) LoginHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"token": token})
 }
 
-func (h *handlerStruct) GenerateToken(ctx context.Context, username string) (string, error) {
+func (h *HandlerStruct) GenerateToken(ctx context.Context, username string) (string, error) {
 	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{

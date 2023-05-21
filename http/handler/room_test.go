@@ -1,4 +1,3 @@
-// http/handler/room_test.go
 package handler_test
 
 import (
@@ -9,34 +8,81 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 
-	_ "github.com/ginkwok/ibook/config"
 	"github.com/ginkwok/ibook/dal/mocks"
-	"github.com/ginkwok/ibook/http/handler"
+	"github.com/ginkwok/ibook/http/middleware"
 	"github.com/ginkwok/ibook/model"
-	"github.com/ginkwok/ibook/service"
 )
 
-func TestCreateRoomHandler(t *testing.T) {
-	// Create a mock controller
+func TestAdminGetAllRoomsHandler(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	// Create a mock DAL
 	mockDAL := mocks.NewMockDal(ctrl)
 
-	// Create a service with the mock DAL
-	mockService := service.NewService(mockDAL, nil)
+	expectedRooms := []*model.Room{
+		{
+			ID:          1,
+			Name:        "test room 1",
+			Capacity:    10,
+			OpeningTime: "08:00:00",
+			ClosingTime: "22:30:00",
+			Location:    "test location",
+			Description: "test description",
+			IsAvaliable: true,
+		},
+		{
+			ID:          2,
+			Name:        "test room 2",
+			Capacity:    20,
+			OpeningTime: "08:00:00",
+			ClosingTime: "22:30:00",
+			Location:    "test location",
+			Description: "test description",
+			IsAvaliable: true,
+		},
+		{
+			ID:          3,
+			Name:        "test room 3",
+			Capacity:    30,
+			OpeningTime: "08:00:00",
+			ClosingTime: "22:30:00",
+			Location:    "test location",
+			Description: "test description",
+			IsAvaliable: true,
+		},
+	}
 
-	// Create a handler with the mock service
-	httpHandler := handler.NewHandler(mockService)
+	mockDAL.EXPECT().GetAllRooms(gomock.Any()).Return(expectedRooms, nil).Times(1)
 
-	// Create a test router
-	router := gin.Default()
-	router.POST("/admin/rooms", httpHandler.AdminCreateRoomHandler)
+	httpHandler, router, token := getTestRouter(t, mockDAL)
+	router.GET("/admin/rooms", middleware.AuthMiddleware(), httpHandler.AdminGetAllRoomsHandler)
+
+	req, err := http.NewRequest("GET", "/admin/rooms", nil)
+	assert.NoError(t, err)
+
+	req.Header.Set("Authorization", "Bearer "+token)
+
+	recorder := httptest.NewRecorder()
+
+	router.ServeHTTP(recorder, req)
+
+	assert.Equal(t, http.StatusOK, recorder.Code)
+
+	var response []*model.Room
+	err = json.Unmarshal(recorder.Body.Bytes(), &response)
+	assert.NoError(t, err)
+
+	assert.Equal(t, expectedRooms, response)
+}
+
+func TestCreateRoomHandler(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockDAL := mocks.NewMockDal(ctrl)
 
 	// Create test rooms
 	rooms := []*model.Room{
@@ -77,11 +123,15 @@ func TestCreateRoomHandler(t *testing.T) {
 		mockDAL.EXPECT().CreateRoom(gomock.Any(), room).Return(&roomCopy, nil)
 	}
 
+	httpHandler, router, token := getTestRouter(t, mockDAL)
+	router.POST("/admin/rooms", middleware.AuthMiddleware(), httpHandler.AdminCreateRoomHandler)
+
 	// Perform the requests to create rooms
 	for _, room := range rooms {
 		roomJSON, _ := json.Marshal(room)
 		req, _ := http.NewRequest("POST", "/admin/rooms", bytes.NewBuffer(roomJSON))
 		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("Authorization", "Bearer "+token)
 
 		w := httptest.NewRecorder()
 		router.ServeHTTP(w, req.WithContext(context.Background()))
@@ -90,55 +140,164 @@ func TestCreateRoomHandler(t *testing.T) {
 	}
 }
 
-// func TestCreateRoomHandler1(t *testing.T) {
-// 	// Create a mock controller
-// 	ctrl := gomock.NewController(t)
-// 	defer ctrl.Finish()
+func TestAdminDeleteRoomHandler(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
 
-// 	// Create a mock DAL
-// 	mockDAL := mocks.NewMockDal(ctrl)
+	mockDAL := mocks.NewMockDal(ctrl)
 
-// 	// Set up the expected DAL behavior
-// 	room := &model.Room{
-// 		ID:          1,
-// 		Name:        "test room",
-// 		Capacity:    10,
-// 		OpeningTime: "08:00:00",
-// 		ClosingTime: "22:30:00",
-// 		Location:    "test location",
-// 		Description: "test description",
-// 		IsAvaliable: true,
-// 	}
-// 	mockDAL.EXPECT().CreateRoom(gomock.Any(), room).Return(room, nil)
+	var roomID int64 = 1
 
-// 	// Create a service with the mock DAL
-// 	mockService := service.NewService(mockDAL, nil)
+	mockDAL.EXPECT().DeleteRoom(gomock.Any(), roomID).Return(nil)
+	mockDAL.EXPECT().DeleteSeatsOfRoom(gomock.Any(), roomID).Return(nil)
 
-// 	// Create a handler with the mock service
-// 	httpHandler := handler.NewHandler(mockService)
+	httpHandler, router, token := getTestRouter(t, mockDAL)
+	router.DELETE("/admin/rooms/:room_id", middleware.AuthMiddleware(), httpHandler.AdminDeleteRoomHandler)
 
-// 	// Create a test router
-// 	router := gin.Default()
-// 	router.POST("/admin/rooms", httpHandler.AdminCreateRoomHandler)
+	req, err := http.NewRequest("DELETE", "/admin/rooms/1", nil)
+	assert.NoError(t, err)
 
-// 	// Create a test request
-// 	room.ID = 0
-// 	roomData, _ := json.Marshal(&room)
-// 	roomJSON := string(roomData)
+	req.Header.Set("Authorization", "Bearer "+token)
 
-// 	req, _ := http.NewRequest("POST", "/admin/rooms", strings.NewReader(roomJSON))
-// 	req.Header.Set("Content-Type", "application/json")
+	recorder := httptest.NewRecorder()
 
-// 	// Perform the request
-// 	w := httptest.NewRecorder()
-// 	router.ServeHTTP(w, req.WithContext(context.Background()))
+	router.ServeHTTP(recorder, req)
 
-// 	// Check the response status code
-// 	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, http.StatusOK, recorder.Code)
+}
 
-// 	// Check the response body
-// 	room.ID = 0
-// 	expectedResponseData, _ := json.Marshal(&room)
-// 	expectedResponse := string(expectedResponseData)
-// 	assert.Equal(t, expectedResponse, w.Body.String())
-// }
+func TestAdminGetRoomByIDHandler(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockDAL := mocks.NewMockDal(ctrl)
+
+	mockRoom := &model.Room{ID: 1, Name: "Test Room"}
+	mockDAL.EXPECT().GetRoomByID(gomock.Any(), gomock.Any()).Return(mockRoom, nil)
+
+	httpHandler, router, token := getTestRouter(t, mockDAL)
+	router.GET("/admin/rooms/:room_id", middleware.AuthMiddleware(), httpHandler.AdminGetRoomByIDHandler)
+
+	req, err := http.NewRequest("GET", "/admin/rooms/1", nil)
+	assert.NoError(t, err)
+
+	req.Header.Set("Authorization", "Bearer "+token)
+
+	recorder := httptest.NewRecorder()
+
+	router.ServeHTTP(recorder, req)
+
+	assert.Equal(t, http.StatusOK, recorder.Code)
+
+	var responseRoom model.Room
+	err = json.Unmarshal(recorder.Body.Bytes(), &responseRoom)
+	assert.NoError(t, err)
+
+	assert.Equal(t, mockRoom.ID, responseRoom.ID)
+	assert.Equal(t, mockRoom.Name, responseRoom.Name)
+}
+
+func TestAdminUpdateRoomHandler(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockDAL := mocks.NewMockDal(ctrl)
+
+	updatedRoom := &model.Room{
+		ID:          1,
+		Name:        "Updated Room",
+		Capacity:    30,
+		OpeningTime: "08:00:00",
+		ClosingTime: "22:30:00",
+		Location:    "test location",
+		Description: "test description",
+		IsAvaliable: true,
+	}
+
+	mockDAL.EXPECT().UpdateRoom(gomock.Any(), gomock.Any()).Return(updatedRoom, nil)
+
+	httpHandler, router, token := getTestRouter(t, mockDAL)
+	router.PATCH("/admin/rooms/:room_id", middleware.AuthMiddleware(), httpHandler.AdminUpdateRoomHandler)
+
+	reqBody, err := json.Marshal(updatedRoom)
+	assert.NoError(t, err)
+
+	req, err := http.NewRequest("PATCH", "/admin/rooms/1", bytes.NewBuffer(reqBody))
+	assert.NoError(t, err)
+
+	req.Header.Set("Authorization", "Bearer "+token)
+
+	recorder := httptest.NewRecorder()
+
+	router.ServeHTTP(recorder, req)
+
+	assert.Equal(t, http.StatusOK, recorder.Code)
+
+	var response *model.Room
+	err = json.Unmarshal(recorder.Body.Bytes(), &response)
+	assert.NoError(t, err)
+
+	assert.Equal(t, updatedRoom, response)
+}
+
+func TestGetAllRoomsHandler(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockDAL := mocks.NewMockDal(ctrl)
+
+	expectedRooms := []*model.Room{
+		{
+			ID:          1,
+			Name:        "test room 1",
+			Capacity:    10,
+			OpeningTime: "08:00:00",
+			ClosingTime: "22:30:00",
+			Location:    "test location",
+			Description: "test description",
+			IsAvaliable: true,
+		},
+		{
+			ID:          2,
+			Name:        "test room 2",
+			Capacity:    20,
+			OpeningTime: "08:00:00",
+			ClosingTime: "22:30:00",
+			Location:    "test location",
+			Description: "test description",
+			IsAvaliable: true,
+		},
+		{
+			ID:          3,
+			Name:        "test room 3",
+			Capacity:    30,
+			OpeningTime: "08:00:00",
+			ClosingTime: "22:30:00",
+			Location:    "test location",
+			Description: "test description",
+			IsAvaliable: true,
+		},
+	}
+
+	mockDAL.EXPECT().GetAllRooms(gomock.Any()).Return(expectedRooms, nil).Times(1)
+
+	httpHandler, router, token := getTestRouter(t, mockDAL)
+	router.GET("/rooms", middleware.AuthMiddleware(), httpHandler.GetAllRoomsHandler)
+
+	req, err := http.NewRequest("GET", "/rooms", nil)
+	assert.NoError(t, err)
+
+	req.Header.Set("Authorization", "Bearer "+token)
+
+	recorder := httptest.NewRecorder()
+
+	router.ServeHTTP(recorder, req)
+
+	assert.Equal(t, http.StatusOK, recorder.Code)
+
+	var response []*model.Room
+	err = json.Unmarshal(recorder.Body.Bytes(), &response)
+	assert.NoError(t, err)
+
+	assert.Equal(t, expectedRooms, response)
+}
