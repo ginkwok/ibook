@@ -6,6 +6,7 @@ package mocks
 
 import (
 	reflect "reflect"
+	time "time"
 
 	model "github.com/ginkwok/ibook/model"
 	gomock "github.com/golang/mock/gomock"
@@ -286,6 +287,36 @@ func (mr *MockDalMockRecorder) GetSeatByID(arg0, arg1 interface{}) *gomock.Call 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSeatByID", reflect.TypeOf((*MockDal)(nil).GetSeatByID), arg0, arg1)
 }
 
+// GetUnsignedResvsAfterStart mocks base method.
+func (m *MockDal) GetUnsignedResvsAfterStart(arg0 *gorm.DB, arg1 time.Time, arg2 time.Duration) ([]*model.Reservation, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUnsignedResvsAfterStart", arg0, arg1, arg2)
+	ret0, _ := ret[0].([]*model.Reservation)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetUnsignedResvsAfterStart indicates an expected call of GetUnsignedResvsAfterStart.
+func (mr *MockDalMockRecorder) GetUnsignedResvsAfterStart(arg0, arg1, arg2 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUnsignedResvsAfterStart", reflect.TypeOf((*MockDal)(nil).GetUnsignedResvsAfterStart), arg0, arg1, arg2)
+}
+
+// GetUnsignedResvsBeforeStart mocks base method.
+func (m *MockDal) GetUnsignedResvsBeforeStart(arg0 *gorm.DB, arg1 time.Time, arg2 time.Duration) ([]*model.Reservation, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUnsignedResvsBeforeStart", arg0, arg1, arg2)
+	ret0, _ := ret[0].([]*model.Reservation)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetUnsignedResvsBeforeStart indicates an expected call of GetUnsignedResvsBeforeStart.
+func (mr *MockDalMockRecorder) GetUnsignedResvsBeforeStart(arg0, arg1, arg2 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUnsignedResvsBeforeStart", reflect.TypeOf((*MockDal)(nil).GetUnsignedResvsBeforeStart), arg0, arg1, arg2)
+}
+
 // GetUserByName mocks base method.
 func (m *MockDal) GetUserByName(arg0 *gorm.DB, arg1 string) (*model.User, error) {
 	m.ctrl.T.Helper()
@@ -299,6 +330,21 @@ func (m *MockDal) GetUserByName(arg0 *gorm.DB, arg1 string) (*model.User, error)
 func (mr *MockDalMockRecorder) GetUserByName(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserByName", reflect.TypeOf((*MockDal)(nil).GetUserByName), arg0, arg1)
+}
+
+// SearchSeats mocks base method.
+func (m *MockDal) SearchSeats(arg0 *gorm.DB, arg1 []string, arg2 []interface{}) ([]*model.Seat, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SearchSeats", arg0, arg1, arg2)
+	ret0, _ := ret[0].([]*model.Seat)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// SearchSeats indicates an expected call of SearchSeats.
+func (mr *MockDalMockRecorder) SearchSeats(arg0, arg1, arg2 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SearchSeats", reflect.TypeOf((*MockDal)(nil).SearchSeats), arg0, arg1, arg2)
 }
 
 // UpdateResv mocks base method.

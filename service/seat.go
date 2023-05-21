@@ -70,6 +70,11 @@ func (s *svc) UpdateSeat(ctx context.Context, seat *model.Seat) (*model.Seat, er
 	return seat, nil
 }
 
-func (s *svc) SearchSeats(ctx context.Context) ([]*model.Seat, error) {
-	return nil, nil
+func (s *svc) SearchSeats(ctx context.Context, conditions []string, args []interface{}) ([]*model.Seat, error) {
+	seats, err := s.dal.SearchSeats(dal.GetDB(), conditions, args)
+	if err != nil {
+		s.logger.Errorln(err)
+		return nil, err
+	}
+	return seats, nil
 }

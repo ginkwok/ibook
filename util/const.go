@@ -20,3 +20,9 @@ const (
 	ResvStatusSignouted = "signouted"
 	ResvStatusCancelled = "cancelled"
 )
+
+var (
+	NoticeBeforeStart = `Dear user, Your seat reservation will begin within 15 minutes. Please signin promptly.`
+	NoticeAfterStart  = `Dear user, Your seat reservation has arrived at the start time. Please signin promptly.`
+	NoticeCancel      = "Dear user, your seat reservation has exceeded the start time by 30 minutes and has not been signed in. The system has automatically cancelled the reservation."
+)

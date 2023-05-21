@@ -265,7 +265,3 @@ func TestGetAllSeatsOfRoomHandler(t *testing.T) {
 
 	assert.Equal(t, seats, response)
 }
-
-func TestSearchSeatsHandler(t *testing.T) {
-	// router.GET("/search", middleware.AuthMiddleware(), httpHandler.SearchSeatsHandler)
-}

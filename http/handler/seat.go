@@ -341,7 +341,37 @@ func (h *HandlerStruct) SearchSeatsHandler(c *gin.Context) {
 	ctx := c.Request.Context()
 	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
 
-	seats, err := h.svc.SearchSeats(ctx)
+	var conditions []string
+	var args []interface{}
+
+	if roomID := c.Query("room_id"); roomID != "" {
+		conditions = append(conditions, "room_id = ?")
+		args = append(args, roomID)
+	}
+
+	if isAvailable := c.Query("is_avaliable"); isAvailable != "" {
+		conditions = append(conditions, "is_avaliable = ?")
+		args = append(args, isAvailable)
+	}
+
+	if tagWindow := c.Query("tag_window"); tagWindow != "" {
+		conditions = append(conditions, "tag_window = ?")
+		args = append(args, tagWindow)
+	}
+
+	if tagOutlet := c.Query("tag_outlet"); tagOutlet != "" {
+		conditions = append(conditions, "tag_outlet = ?")
+		args = append(args, tagOutlet)
+	}
+
+	if len(conditions) <= 0 {
+		err := errors.New("query is null")
+		logger.Errorln(err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	seats, err := h.svc.SearchSeats(ctx, conditions, args)
 	if err != nil {
 		logger.Errorln(err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

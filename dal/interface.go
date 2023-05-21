@@ -1,6 +1,8 @@
 package dal
 
 import (
+	"time"
+
 	"gorm.io/gorm"
 
 	"github.com/ginkwok/ibook/model"
@@ -25,12 +27,15 @@ type Dal interface {
 	DeleteSeatsOfRoom(db *gorm.DB, roomID int64) error
 	GetSeatByID(db *gorm.DB, seatID int64) (*model.Seat, error)
 	UpdateSeat(db *gorm.DB, seat *model.Seat) (*model.Seat, error)
+	SearchSeats(db *gorm.DB, conditions []string, args []interface{}) ([]*model.Seat, error)
 
 	CreateResv(db *gorm.DB, resv *model.Reservation) (*model.Reservation, error)
 	GetResvByID(db *gorm.DB, resvID int64) (*model.Reservation, error)
 	GetResvsBySeat(db *gorm.DB, seatID int64) ([]*model.Reservation, error)
 	GetResvsByUser(db *gorm.DB, username string) ([]*model.Reservation, error)
 	UpdateResv(db *gorm.DB, resv *model.Reservation) (*model.Reservation, error)
+	GetUnsignedResvsBeforeStart(db *gorm.DB, now time.Time, dur time.Duration) ([]*model.Reservation, error)
+	GetUnsignedResvsAfterStart(db *gorm.DB, now time.Time, dur time.Duration) ([]*model.Reservation, error)
 }
 
 func GetDal(db *gorm.DB) Dal {

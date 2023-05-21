@@ -1,9 +1,12 @@
 package dal
 
 import (
+	"time"
+
 	"gorm.io/gorm"
 
 	"github.com/ginkwok/ibook/model"
+	"github.com/ginkwok/ibook/util"
 )
 
 func (d *dal) CreateResv(db *gorm.DB, resv *model.Reservation) (*model.Reservation, error) {
@@ -57,4 +60,22 @@ func (d *dal) UpdateResv(db *gorm.DB, resv *model.Reservation) (*model.Reservati
 		return nil, err
 	}
 	return resv, nil
+}
+
+func (d *dal) GetUnsignedResvsBeforeStart(db *gorm.DB, now time.Time, dur time.Duration) ([]*model.Reservation, error) {
+	var resvs []*model.Reservation
+	err := db.Where("status = ? AND resv_start_time > ? AND resv_start_time - ? <= ?", util.ResvStatusUnsignin, now, dur, now).Find(&resvs).Error
+	if err != nil {
+		return nil, err
+	}
+	return resvs, nil
+}
+
+func (d *dal) GetUnsignedResvsAfterStart(db *gorm.DB, now time.Time, dur time.Duration) ([]*model.Reservation, error) {
+	var resvs []*model.Reservation
+	err := db.Where("status = ? AND ? > resv_start_time AND ? - resv_start_time >= ?", util.ResvStatusUnsignin, now, now, dur).Find(&resvs).Error
+	if err != nil {
+		return nil, err
+	}
+	return resvs, nil
 }

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 
@@ -23,6 +24,8 @@ func main() {
 	dalClient := dal.GetDal(db)
 
 	svc := service.NewService(dalClient, logger)
+
+	go svc.NoticeMonitoring(context.Background())
 
 	httpHandler := handler.NewHandler(svc)
 

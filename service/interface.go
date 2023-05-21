@@ -27,7 +27,7 @@ type Service interface {
 	DeleteSeatsOfRoom(ctx context.Context, roomID int64) error
 	GetSeatByID(ctx context.Context, seatID int64) (*model.Seat, error)
 	UpdateSeat(ctx context.Context, seat *model.Seat) (*model.Seat, error)
-	SearchSeats(ctx context.Context) ([]*model.Seat, error)
+	SearchSeats(ctx context.Context, conditions []string, args []interface{}) ([]*model.Seat, error)
 
 	GetResvsBySeat(ctx context.Context, seatID int64) ([]*model.Reservation, error)
 	GetResvsByUser(ctx context.Context, username string) ([]*model.Reservation, error)
@@ -36,6 +36,8 @@ type Service interface {
 	SigninResv(ctx context.Context, signinTime *time.Time, resvID int64) (*model.Reservation, error)
 	SignoutResv(ctx context.Context, signoutTime *time.Time, resvID int64) (*model.Reservation, error)
 	GetResvByID(ctx context.Context, resvID int64) (*model.Reservation, error)
+
+	NoticeMonitoring(ctx context.Context)
 }
 
 func NewService(dalClient dal.Dal, logger *zap.SugaredLogger) Service {

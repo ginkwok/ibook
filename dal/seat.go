@@ -1,6 +1,8 @@
 package dal
 
 import (
+	"strings"
+
 	"gorm.io/gorm"
 
 	"github.com/ginkwok/ibook/model"
@@ -64,4 +66,18 @@ func (d *dal) UpdateSeat(db *gorm.DB, seat *model.Seat) (*model.Seat, error) {
 		return nil, err
 	}
 	return seat, nil
+}
+
+func (d *dal) SearchSeats(db *gorm.DB, conditions []string, args []interface{}) ([]*model.Seat, error) {
+	queryStr := "SELECT * FROM seats"
+	if len(conditions) > 0 {
+		queryStr += " WHERE " + strings.Join(conditions, " AND ")
+	}
+
+	var seats []*model.Seat
+	err := db.Raw(queryStr, args...).Scan(&seats).Error
+	if err != nil {
+		return nil, err
+	}
+	return seats, nil
 }
