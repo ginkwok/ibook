@@ -39,7 +39,7 @@ func TestRegisterHandler(t *testing.T) {
 	for i, user := range users {
 		userCopy := *user
 		userCopy.ID = uint(i + 1)
-		mockDAL.EXPECT().CreateUser(gomock.Any(), gomock.Any()).Return(&userCopy, nil)
+		mockDAL.EXPECT().CreateUser(gomock.Any()).Return(&userCopy, nil)
 	}
 
 	httpHandler, router, _ := getTestRouter(t, mockDAL)
@@ -63,7 +63,7 @@ func TestLoginHandler(t *testing.T) {
 
 	mockDAL := mocks.NewMockDal(ctrl)
 
-	mockDAL.EXPECT().CheckUser(gomock.Any(), gomock.Any(), gomock.Any()).Return(true, nil)
+	mockDAL.EXPECT().CheckUser(gomock.Any(), gomock.Any()).Return(true, nil)
 
 	httpHandler, router, _ := getTestRouter(t, mockDAL)
 	router.POST("/login", httpHandler.LoginHandler)

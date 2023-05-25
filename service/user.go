@@ -4,12 +4,11 @@ import (
 	"context"
 	"errors"
 
-	"github.com/ginkwok/ibook/dal"
 	"github.com/ginkwok/ibook/model"
 )
 
 func (s *svc) CreateUser(ctx context.Context, user *model.User) (*model.User, error) {
-	user, err := s.dal.CreateUser(dal.GetDB(), user)
+	user, err := s.dal.CreateUser(user)
 	if err != nil {
 		s.logger.Errorln(err)
 		return nil, err
@@ -18,7 +17,7 @@ func (s *svc) CreateUser(ctx context.Context, user *model.User) (*model.User, er
 }
 
 func (s *svc) CheckUser(ctx context.Context, username string, password string) (bool, error) {
-	ok, err := s.dal.CheckUser(dal.GetDB(), username, password)
+	ok, err := s.dal.CheckUser(username, password)
 	if err != nil {
 		s.logger.Errorln(err)
 		return false, err

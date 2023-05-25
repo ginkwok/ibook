@@ -1,6 +1,8 @@
 package dal
 
 import (
+	"sync"
+
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 
@@ -9,9 +11,12 @@ import (
 	"github.com/spf13/viper"
 )
 
-var DB *gorm.DB
+var (
+	DB   *gorm.DB
+	once sync.Once
+)
 
-func init() {
+func createDB() {
 	host := viper.GetString("db.mysql.host")
 	port := viper.GetString("db.mysql.port")
 	user := viper.GetString("db.mysql.username")
@@ -49,5 +54,6 @@ func init() {
 }
 
 func GetDB() *gorm.DB {
+	once.Do(createDB)
 	return DB
 }

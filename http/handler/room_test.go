@@ -55,7 +55,7 @@ func TestAdminGetAllRoomsHandler(t *testing.T) {
 		},
 	}
 
-	mockDAL.EXPECT().GetAllRooms(gomock.Any()).Return(expectedRooms, nil).Times(1)
+	mockDAL.EXPECT().GetAllRooms().Return(expectedRooms, nil).Times(1)
 
 	httpHandler, router, token := getTestRouter(t, mockDAL)
 	router.GET("/admin/rooms", middleware.AuthMiddleware(), httpHandler.AdminGetAllRoomsHandler)
@@ -120,7 +120,7 @@ func TestCreateRoomHandler(t *testing.T) {
 	for i, room := range rooms {
 		roomCopy := *room
 		roomCopy.ID = int64(i + 1) // Set the expected ID based on the index
-		mockDAL.EXPECT().CreateRoom(gomock.Any(), room).Return(&roomCopy, nil)
+		mockDAL.EXPECT().CreateRoom(room).Return(&roomCopy, nil)
 	}
 
 	httpHandler, router, token := getTestRouter(t, mockDAL)
@@ -148,8 +148,8 @@ func TestAdminDeleteRoomHandler(t *testing.T) {
 
 	var roomID int64 = 1
 
-	mockDAL.EXPECT().DeleteRoom(gomock.Any(), roomID).Return(nil)
-	mockDAL.EXPECT().DeleteSeatsOfRoom(gomock.Any(), roomID).Return(nil)
+	mockDAL.EXPECT().DeleteRoom(roomID).Return(nil)
+	mockDAL.EXPECT().DeleteSeatsOfRoom(roomID).Return(nil)
 
 	httpHandler, router, token := getTestRouter(t, mockDAL)
 	router.DELETE("/admin/rooms/:room_id", middleware.AuthMiddleware(), httpHandler.AdminDeleteRoomHandler)
@@ -173,7 +173,7 @@ func TestAdminGetRoomByIDHandler(t *testing.T) {
 	mockDAL := mocks.NewMockDal(ctrl)
 
 	mockRoom := &model.Room{ID: 1, Name: "Test Room"}
-	mockDAL.EXPECT().GetRoomByID(gomock.Any(), gomock.Any()).Return(mockRoom, nil)
+	mockDAL.EXPECT().GetRoomByID(gomock.Any()).Return(mockRoom, nil)
 
 	httpHandler, router, token := getTestRouter(t, mockDAL)
 	router.GET("/admin/rooms/:room_id", middleware.AuthMiddleware(), httpHandler.AdminGetRoomByIDHandler)
@@ -214,7 +214,7 @@ func TestAdminUpdateRoomHandler(t *testing.T) {
 		IsAvaliable: true,
 	}
 
-	mockDAL.EXPECT().UpdateRoom(gomock.Any(), gomock.Any()).Return(updatedRoom, nil)
+	mockDAL.EXPECT().UpdateRoom(gomock.Any()).Return(updatedRoom, nil)
 
 	httpHandler, router, token := getTestRouter(t, mockDAL)
 	router.PATCH("/admin/rooms/:room_id", middleware.AuthMiddleware(), httpHandler.AdminUpdateRoomHandler)
@@ -279,7 +279,7 @@ func TestGetAllRoomsHandler(t *testing.T) {
 		},
 	}
 
-	mockDAL.EXPECT().GetAllRooms(gomock.Any()).Return(expectedRooms, nil).Times(1)
+	mockDAL.EXPECT().GetAllRooms().Return(expectedRooms, nil).Times(1)
 
 	httpHandler, router, token := getTestRouter(t, mockDAL)
 	router.GET("/rooms", middleware.AuthMiddleware(), httpHandler.GetAllRoomsHandler)

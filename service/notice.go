@@ -7,7 +7,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ginkwok/ibook/dal"
 	"github.com/ginkwok/ibook/model"
 	"github.com/ginkwok/ibook/util"
 )
@@ -26,7 +25,7 @@ func (s *svc) noticeMonitoring(ctx context.Context) {
 }
 
 func (s *svc) noticeMonitoringBeforeStart(ctx context.Context, now time.Time) {
-	resvs, err := s.dal.GetUnsignedResvsBeforeStart(dal.GetDB(), now, time.Minute*15)
+	resvs, err := s.dal.GetUnsignedResvsBeforeStart(now, time.Minute*15)
 	if err != nil {
 		s.logger.Errorln(err)
 		return
@@ -41,7 +40,7 @@ func (s *svc) noticeMonitoringBeforeStart(ctx context.Context, now time.Time) {
 }
 
 func (s *svc) noticeMonitoringAfterStart(ctx context.Context, now time.Time) {
-	resvs, err := s.dal.GetUnsignedResvsAfterStart(dal.GetDB(), now, time.Minute*15)
+	resvs, err := s.dal.GetUnsignedResvsAfterStart(now, time.Minute*15)
 	if err != nil {
 		s.logger.Errorln(err)
 		return
@@ -65,7 +64,7 @@ func (s *svc) noticeMonitoringAfterStart(ctx context.Context, now time.Time) {
 }
 
 func (s *svc) beforeStartNotice(resv *model.Reservation) error {
-	user, err := s.dal.GetUserByName(dal.GetDB(), resv.Username)
+	user, err := s.dal.GetUserByName(resv.Username)
 	if err != nil {
 		s.logger.Errorln(err)
 		return err
@@ -80,7 +79,7 @@ func (s *svc) beforeStartNotice(resv *model.Reservation) error {
 }
 
 func (s *svc) afterStartNotice(resv *model.Reservation) error {
-	user, err := s.dal.GetUserByName(dal.GetDB(), resv.Username)
+	user, err := s.dal.GetUserByName(resv.Username)
 	if err != nil {
 		s.logger.Errorln(err)
 		return err
@@ -101,7 +100,7 @@ func (s *svc) cancelAndNotice(ctx context.Context, resv *model.Reservation) erro
 		return err
 	}
 
-	user, err := s.dal.GetUserByName(dal.GetDB(), resv.Username)
+	user, err := s.dal.GetUserByName(resv.Username)
 	if err != nil {
 		s.logger.Errorln(err)
 		return err

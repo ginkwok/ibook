@@ -31,7 +31,7 @@ func TestAdminGetResvsBySeatHandler(t *testing.T) {
 			Status:   util.ResvStatusUnsignin,
 		},
 	}
-	mockDAL.EXPECT().GetResvsBySeat(gomock.Any(), gomock.Any()).Return(mockResvs, nil)
+	mockDAL.EXPECT().GetResvsBySeat(gomock.Any()).Return(mockResvs, nil)
 
 	httpHandler, router, token := getTestRouter(t, mockDAL)
 
@@ -68,7 +68,7 @@ func TestAdminCancelResvHandler(t *testing.T) {
 		SeatID:   1,
 		Status:   util.ResvStatusUnsignin,
 	}
-	mockDAL.EXPECT().GetResvByID(gomock.Any(), gomock.Any()).Return(mockOldResv, nil)
+	mockDAL.EXPECT().GetResvByID(gomock.Any()).Return(mockOldResv, nil)
 
 	mockResv := &model.Reservation{
 		ID:       1,
@@ -77,7 +77,7 @@ func TestAdminCancelResvHandler(t *testing.T) {
 		SeatID:   1,
 		Status:   util.ResvStatusCancelled,
 	}
-	mockDAL.EXPECT().UpdateResv(gomock.Any(), gomock.Any()).Return(mockResv, nil)
+	mockDAL.EXPECT().UpdateResv(gomock.Any()).Return(mockResv, nil)
 
 	httpHandler, router, token := getTestRouter(t, mockDAL)
 	router.PATCH("/admin/rooms/:room_id/seats/:seat_id/reservations/:resv_id", middleware.AuthMiddleware(), httpHandler.AdminCancelResvHandler)
@@ -115,7 +115,7 @@ func TestGetResvsByUserHandler(t *testing.T) {
 			Status:   util.ResvStatusCancelled,
 		},
 	}
-	mockDAL.EXPECT().GetResvsByUser(gomock.Any(), gomock.Any()).Return(mockResvs, nil)
+	mockDAL.EXPECT().GetResvsByUser(gomock.Any()).Return(mockResvs, nil)
 
 	httpHandler, router, token := getTestRouter(t, mockDAL)
 	router.GET("/reservations", middleware.AuthMiddleware(), httpHandler.GetResvsByUserHandler)
@@ -177,7 +177,7 @@ func TestCreateResvHandler(t *testing.T) {
 	for i, resv := range resvs {
 		resvCopy := *resv
 		resvCopy.ID = int64(i + 1) // Set the expected ID based on the index
-		mockDAL.EXPECT().CreateResv(gomock.Any(), gomock.Any()).Return(&resvCopy, nil)
+		mockDAL.EXPECT().CreateResv(gomock.Any()).Return(&resvCopy, nil)
 	}
 
 	httpHandler, router, token := getTestRouter(t, mockDAL)
@@ -221,7 +221,7 @@ func TestCancelResvHandler(t *testing.T) {
 		SeatID:   1,
 		Status:   util.ResvStatusUnsignin,
 	}
-	mockDAL.EXPECT().GetResvByID(gomock.Any(), gomock.Any()).Return(mockOldResv, nil).Times(2)
+	mockDAL.EXPECT().GetResvByID(gomock.Any()).Return(mockOldResv, nil).Times(2)
 
 	mockResv := &model.Reservation{
 		ID:       1,
@@ -230,8 +230,8 @@ func TestCancelResvHandler(t *testing.T) {
 		SeatID:   1,
 		Status:   util.ResvStatusCancelled,
 	}
-	mockDAL.EXPECT().GetResvByID(gomock.Any(), gomock.Any()).Return(mockResv, nil).AnyTimes()
-	mockDAL.EXPECT().UpdateResv(gomock.Any(), gomock.Any()).Return(mockResv, nil)
+	mockDAL.EXPECT().GetResvByID(gomock.Any()).Return(mockResv, nil).AnyTimes()
+	mockDAL.EXPECT().UpdateResv(gomock.Any()).Return(mockResv, nil)
 
 	httpHandler, router, token := getTestRouter(t, mockDAL)
 	router.PATCH("/reservations/:resv_id/cancel", middleware.AuthMiddleware(), httpHandler.CancelResvHandler)
@@ -273,7 +273,7 @@ func TestSigninResvHandler(t *testing.T) {
 		ResvEndTime:   &time2,
 		Status:        util.ResvStatusUnsignin,
 	}
-	mockDAL.EXPECT().GetResvByID(gomock.Any(), gomock.Any()).Return(mockOldResv, nil).Times(2)
+	mockDAL.EXPECT().GetResvByID(gomock.Any()).Return(mockOldResv, nil).Times(2)
 
 	mockResv := &model.Reservation{
 		ID:            1,
@@ -284,9 +284,9 @@ func TestSigninResvHandler(t *testing.T) {
 		ResvEndTime:   &time2,
 		Status:        util.ResvStatusSignined,
 	}
-	mockDAL.EXPECT().GetResvByID(gomock.Any(), gomock.Any()).Return(mockResv, nil).AnyTimes()
+	mockDAL.EXPECT().GetResvByID(gomock.Any()).Return(mockResv, nil).AnyTimes()
 
-	mockDAL.EXPECT().UpdateResv(gomock.Any(), gomock.Any()).Return(mockResv, nil)
+	mockDAL.EXPECT().UpdateResv(gomock.Any()).Return(mockResv, nil)
 
 	httpHandler, router, token := getTestRouter(t, mockDAL)
 	router.PATCH("/reservations/:resv_id/signin", middleware.AuthMiddleware(), httpHandler.SigninResvHandler)
@@ -329,7 +329,7 @@ func TestSignoutResvHandler(t *testing.T) {
 		ResvEndTime:   &time2,
 		Status:        util.ResvStatusSignined,
 	}
-	mockDAL.EXPECT().GetResvByID(gomock.Any(), gomock.Any()).Return(mockOldResv, nil).Times(2)
+	mockDAL.EXPECT().GetResvByID(gomock.Any()).Return(mockOldResv, nil).Times(2)
 
 	mockResv := &model.Reservation{
 		ID:            1,
@@ -340,9 +340,9 @@ func TestSignoutResvHandler(t *testing.T) {
 		ResvEndTime:   &time2,
 		Status:        util.ResvStatusSignouted,
 	}
-	mockDAL.EXPECT().GetResvByID(gomock.Any(), gomock.Any()).Return(mockResv, nil).AnyTimes()
+	mockDAL.EXPECT().GetResvByID(gomock.Any()).Return(mockResv, nil).AnyTimes()
 
-	mockDAL.EXPECT().UpdateResv(gomock.Any(), gomock.Any()).Return(mockResv, nil)
+	mockDAL.EXPECT().UpdateResv(gomock.Any()).Return(mockResv, nil)
 
 	httpHandler, router, token := getTestRouter(t, mockDAL)
 	router.PATCH("/reservations/:resv_id/signout", middleware.AuthMiddleware(), httpHandler.SignoutResvHandler)

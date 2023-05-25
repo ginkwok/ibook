@@ -257,14 +257,14 @@ func (h *HandlerStruct) CancelResvHandler(c *gin.Context) {
 		return
 	}
 
-	resvs, err := h.svc.CancelResv(ctx, resvID)
+	resv, err = h.svc.CancelResv(ctx, resvID)
 	if err != nil {
 		logger.Errorln(err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, resvs)
+	c.JSON(http.StatusOK, resv)
 }
 
 func (h *HandlerStruct) SigninResvHandler(c *gin.Context) {
@@ -315,14 +315,14 @@ func (h *HandlerStruct) SigninResvHandler(c *gin.Context) {
 	}
 	nowtime := time.Now().In(loc)
 
-	resvs, err := h.svc.SigninResv(ctx, &nowtime, resvID)
+	resv, err = h.svc.SigninResv(ctx, &nowtime, resvID)
 	if err != nil {
 		logger.Errorln(err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, resvs)
+	c.JSON(http.StatusOK, resv)
 }
 
 func (h *HandlerStruct) SignoutResvHandler(c *gin.Context) {
@@ -373,12 +373,12 @@ func (h *HandlerStruct) SignoutResvHandler(c *gin.Context) {
 	}
 	nowtime := time.Now().In(loc)
 
-	resvs, err := h.svc.SignoutResv(ctx, &nowtime, resvID)
+	resv, err = h.svc.SignoutResv(ctx, &nowtime, resvID)
 	if err != nil {
 		logger.Errorln(err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, resvs)
+	c.JSON(http.StatusOK, resv)
 }

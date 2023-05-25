@@ -5,13 +5,12 @@ import (
 	"errors"
 	"time"
 
-	"github.com/ginkwok/ibook/dal"
 	"github.com/ginkwok/ibook/model"
 	"github.com/ginkwok/ibook/util"
 )
 
 func (s *svc) GetResvsBySeat(ctx context.Context, seatID int64) ([]*model.Reservation, error) {
-	resvs, err := s.dal.GetResvsBySeat(dal.GetDB(), seatID)
+	resvs, err := s.dal.GetResvsBySeat(seatID)
 	if err != nil {
 		s.logger.Errorln(err)
 		return nil, err
@@ -21,7 +20,7 @@ func (s *svc) GetResvsBySeat(ctx context.Context, seatID int64) ([]*model.Reserv
 
 func (s *svc) GetResvsByUser(ctx context.Context, username string) ([]*model.Reservation, error) {
 
-	resvs, err := s.dal.GetResvsByUser(dal.GetDB(), username)
+	resvs, err := s.dal.GetResvsByUser(username)
 	if err != nil {
 		s.logger.Errorln(err)
 		return nil, err
@@ -33,7 +32,7 @@ func (s *svc) CreateResv(ctx context.Context, resv *model.Reservation) (*model.R
 
 	resv.Status = util.ResvStatusUnsignin
 
-	resv, err := s.dal.CreateResv(dal.GetDB(), resv)
+	resv, err := s.dal.CreateResv(resv)
 	if err != nil {
 		s.logger.Errorln(err)
 		return nil, err
@@ -43,7 +42,7 @@ func (s *svc) CreateResv(ctx context.Context, resv *model.Reservation) (*model.R
 
 func (s *svc) CancelResv(ctx context.Context, resvID int64) (*model.Reservation, error) {
 
-	resv, err := s.dal.GetResvByID(dal.GetDB(), resvID)
+	resv, err := s.dal.GetResvByID(resvID)
 	if err != nil {
 		s.logger.Errorln(err)
 		return nil, err
@@ -51,7 +50,7 @@ func (s *svc) CancelResv(ctx context.Context, resvID int64) (*model.Reservation,
 
 	resv.Status = util.ResvStatusCancelled
 
-	resv, err = s.dal.UpdateResv(dal.GetDB(), resv)
+	resv, err = s.dal.UpdateResv(resv)
 	if err != nil {
 		s.logger.Errorln(err)
 		return nil, err
@@ -61,7 +60,7 @@ func (s *svc) CancelResv(ctx context.Context, resvID int64) (*model.Reservation,
 
 func (s *svc) SigninResv(ctx context.Context, signinTime *time.Time, resvID int64) (*model.Reservation, error) {
 
-	resv, err := s.dal.GetResvByID(dal.GetDB(), resvID)
+	resv, err := s.dal.GetResvByID(resvID)
 	if err != nil {
 		s.logger.Errorln(err)
 		return nil, err
@@ -87,7 +86,7 @@ func (s *svc) SigninResv(ctx context.Context, signinTime *time.Time, resvID int6
 	resv.Status = util.ResvStatusSignined
 	resv.SigninTime = signinTime
 
-	resv, err = s.dal.UpdateResv(dal.GetDB(), resv)
+	resv, err = s.dal.UpdateResv(resv)
 	if err != nil {
 		s.logger.Errorln(err)
 		return nil, err
@@ -96,7 +95,7 @@ func (s *svc) SigninResv(ctx context.Context, signinTime *time.Time, resvID int6
 }
 
 func (s *svc) SignoutResv(ctx context.Context, signoutTime *time.Time, resvID int64) (*model.Reservation, error) {
-	resv, err := s.dal.GetResvByID(dal.GetDB(), resvID)
+	resv, err := s.dal.GetResvByID(resvID)
 	if err != nil {
 		s.logger.Errorln(err)
 		return nil, err
@@ -117,7 +116,7 @@ func (s *svc) SignoutResv(ctx context.Context, signoutTime *time.Time, resvID in
 	resv.Status = util.ResvStatusSignouted
 	resv.SignoutTime = signoutTime
 
-	resv, err = s.dal.UpdateResv(dal.GetDB(), resv)
+	resv, err = s.dal.UpdateResv(resv)
 	if err != nil {
 		s.logger.Errorln(err)
 		return nil, err
@@ -127,7 +126,7 @@ func (s *svc) SignoutResv(ctx context.Context, signoutTime *time.Time, resvID in
 
 func (s *svc) GetResvByID(ctx context.Context, resvID int64) (*model.Reservation, error) {
 
-	resv, err := s.dal.GetResvByID(dal.GetDB(), resvID)
+	resv, err := s.dal.GetResvByID(resvID)
 	if err != nil {
 		s.logger.Errorln(err)
 		return nil, err

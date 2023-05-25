@@ -3,12 +3,11 @@ package service
 import (
 	"context"
 
-	"github.com/ginkwok/ibook/dal"
 	"github.com/ginkwok/ibook/model"
 )
 
 func (s *svc) GetAllRooms(ctx context.Context) ([]*model.Room, error) {
-	rooms, err := s.dal.GetAllRooms(dal.GetDB())
+	rooms, err := s.dal.GetAllRooms()
 	if err != nil {
 		s.logger.Errorln(err)
 		return nil, err
@@ -17,7 +16,7 @@ func (s *svc) GetAllRooms(ctx context.Context) ([]*model.Room, error) {
 }
 
 func (s *svc) GetAvailableRooms(ctx context.Context) ([]*model.Room, error) {
-	rooms, err := s.dal.GetAvailableRooms(dal.GetDB())
+	rooms, err := s.dal.GetAvailableRooms()
 	if err != nil {
 		s.logger.Errorln(err)
 		return nil, err
@@ -26,7 +25,7 @@ func (s *svc) GetAvailableRooms(ctx context.Context) ([]*model.Room, error) {
 }
 
 func (s *svc) CreateRoom(ctx context.Context, room *model.Room) (*model.Room, error) {
-	room, err := s.dal.CreateRoom(dal.GetDB(), room)
+	room, err := s.dal.CreateRoom(room)
 	if err != nil {
 		s.logger.Errorln(err)
 		return nil, err
@@ -41,7 +40,7 @@ func (s *svc) DeleteRoom(ctx context.Context, id int64) error {
 		return err
 	}
 
-	err = s.dal.DeleteRoom(dal.GetDB(), id)
+	err = s.dal.DeleteRoom(id)
 	if err != nil {
 		s.logger.Errorln(err)
 		return err
@@ -50,7 +49,7 @@ func (s *svc) DeleteRoom(ctx context.Context, id int64) error {
 }
 
 func (s *svc) GetRoomByID(ctx context.Context, id int64) (*model.Room, error) {
-	room, err := s.dal.GetRoomByID(dal.GetDB(), id)
+	room, err := s.dal.GetRoomByID(id)
 	if err != nil {
 		s.logger.Errorln(err)
 		return nil, err
@@ -59,7 +58,7 @@ func (s *svc) GetRoomByID(ctx context.Context, id int64) (*model.Room, error) {
 }
 
 func (s *svc) UpdateRoom(ctx context.Context, room *model.Room) (*model.Room, error) {
-	room, err := s.dal.UpdateRoom(dal.GetDB(), room)
+	room, err := s.dal.UpdateRoom(room)
 	if err != nil {
 		s.logger.Errorln(err)
 		return nil, err

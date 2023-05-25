@@ -44,7 +44,7 @@ func TestAdminGetAllSeatsOfRoomHandler(t *testing.T) {
 		},
 	}
 
-	mockDAL.EXPECT().GetAllSeatsOfRoom(gomock.Any(), roomID).Return(seats, nil).Times(1)
+	mockDAL.EXPECT().GetAllSeatsOfRoom(roomID).Return(seats, nil).Times(1)
 
 	httpHandler, router, token := getTestRouter(t, mockDAL)
 	router.GET("/admin/rooms/:room_id/seats", middleware.AuthMiddleware(), httpHandler.AdminGetAllSeatsOfRoomHandler)
@@ -95,7 +95,7 @@ func TestAdminCreateSeatsHandler(t *testing.T) {
 		},
 	}
 
-	mockDAL.EXPECT().CreateSeats(gomock.Any(), gomock.Eq(seats)).Return(nil)
+	mockDAL.EXPECT().CreateSeats(gomock.Eq(seats)).Return(nil)
 
 	httpHandler, router, token := getTestRouter(t, mockDAL)
 	router.POST("/admin/rooms/:room_id/seats", middleware.AuthMiddleware(), httpHandler.AdminCreateSeatsHandler)
@@ -121,7 +121,7 @@ func TestAdminDeleteSeatHandler(t *testing.T) {
 	mockDAL := mocks.NewMockDal(ctrl)
 
 	var seatID int64 = 1
-	mockDAL.EXPECT().DeleteSeat(gomock.Any(), seatID).Return(nil)
+	mockDAL.EXPECT().DeleteSeat(seatID).Return(nil)
 
 	httpHandler, router, token := getTestRouter(t, mockDAL)
 	router.DELETE("/admin/rooms/:room_id/seats/:seat_id", middleware.AuthMiddleware(), httpHandler.AdminDeleteSeatHandler)
@@ -150,7 +150,7 @@ func TestAdminGetSeatByIDHandler(t *testing.T) {
 		Location:    "test location 1",
 		IsAvaliable: true,
 	}
-	mockDAL.EXPECT().GetSeatByID(gomock.Any(), mockSeat.ID).Return(mockSeat, nil)
+	mockDAL.EXPECT().GetSeatByID(mockSeat.ID).Return(mockSeat, nil)
 
 	httpHandler, router, token := getTestRouter(t, mockDAL)
 	router.GET("/admin/rooms/:room_id/seats/:seat_id", middleware.AuthMiddleware(), httpHandler.AdminGetSeatByIDHandler)
@@ -187,7 +187,7 @@ func TestAdminUpdateSeatHandler(t *testing.T) {
 		IsAvaliable: true,
 	}
 
-	mockDAL.EXPECT().UpdateSeat(gomock.Any(), gomock.Any()).Return(updatedSeat, nil)
+	mockDAL.EXPECT().UpdateSeat(gomock.Any()).Return(updatedSeat, nil)
 
 	httpHandler, router, token := getTestRouter(t, mockDAL)
 
@@ -243,7 +243,7 @@ func TestGetAllSeatsOfRoomHandler(t *testing.T) {
 		},
 	}
 
-	mockDAL.EXPECT().GetAllSeatsOfRoom(gomock.Any(), roomID).Return(seats, nil).Times(1)
+	mockDAL.EXPECT().GetAllSeatsOfRoom(roomID).Return(seats, nil).Times(1)
 
 	httpHandler, router, token := getTestRouter(t, mockDAL)
 	router.GET("/rooms/:room_id/seats", middleware.AuthMiddleware(), httpHandler.GetAllSeatsOfRoomHandler)
