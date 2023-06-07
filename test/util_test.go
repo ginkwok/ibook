@@ -2,51 +2,48 @@ package test
 
 import (
 	"context"
-	"log"
-	"os"
+	"io/ioutil"
 	"testing"
 
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
+	"go.uber.org/zap"
 
 	_ "github.com/ginkwok/ibook/config"
 	"github.com/ginkwok/ibook/dal/mocks"
 	"github.com/ginkwok/ibook/http/handler"
-	"github.com/ginkwok/ibook/http/middleware"
 	"github.com/ginkwok/ibook/service"
 	"github.com/ginkwok/ibook/util"
 )
 
 func getTestRouter(t *testing.T, mockDAL *mocks.MockDal) (*handler.HandlerStruct, *gin.Engine, string) {
+	logger := zap.NewNop().Sugar()
+	defer logger.Sync()
 
-	testService := service.NewService(mockDAL, nil)
+	testService := service.NewService(mockDAL, logger)
 
 	httpHandler := handler.NewHandler(testService)
 
-	logger := util.NewLogger()
-	defer logger.Sync()
+	gin.SetMode(gin.ReleaseMode)
+	gin.DefaultWriter = ioutil.Discard
 
 	router := gin.Default()
 	gin.SetMode(gin.ReleaseMode)
-	// gin.DefaultWriter = ioutil.Discard
-	// router.Use(disableGinLogger())
-	router.Use(middleware.LoggerMiddleware(logger))
-	// gin.DefaultWriter = ioutil.Discard
+
+	router.Use(loggerMiddleware(logger))
 
 	token, err := httpHandler.GenerateToken(
 		context.WithValue(context.Background(), util.LOGGER_KEY, logger),
-		"TestUser",
+		"TestUser1",
 	)
 	assert.NoError(t, err)
 	return httpHandler, router, token
 }
 
-func disableGinLogger() gin.HandlerFunc {
+func loggerMiddleware(logger *zap.SugaredLogger) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		nullLogger := log.New(os.Stderr, "", 0)
-
-		gin.DefaultWriter = nullLogger.Writer()
-		gin.DefaultErrorWriter = nullLogger.Writer()
+		ctx := context.WithValue(c.Request.Context(), util.LOGGER_KEY, logger)
+		c.Request = c.Request.WithContext(ctx)
 
 		c.Next()
 	}

@@ -1,102 +1,113 @@
 package test
 
 import (
+	"bytes"
+	"context"
+	"encoding/json"
+	"errors"
+	"net/http"
+	"net/http/httptest"
 	"testing"
+
+	"github.com/ginkwok/ibook/dal/mocks"
+	"github.com/ginkwok/ibook/model"
+	"github.com/golang/mock/gomock"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestUserRegister(t *testing.T) {
-	// ctrl := gomock.NewController(t)
-	// defer ctrl.Finish()
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
 
-	// mockDAL := mocks.NewMockDal(ctrl)
+	mockDAL := mocks.NewMockDal(ctrl)
+	httpHandler, router, _ := getTestRouter(t, mockDAL)
+	router.POST("/register", httpHandler.RegisterHandler)
 
-	// user := model.User{
+	user := model.User{
+		Username:  "TestUser1",
+		Password:  "TestUserPass1",
+		Email:     "test1@test.com",
+		NoticeURL: "https://test1.test.com/test1",
+	}
 
-	// 	Username:  "TestUser1",
-	// 	Password:  "TestUserPass1",
-	// 	Email:     "test1@test.com",
-	// 	NoticeURL: "https://test1.test.com/test1",
-	// }
+	t.Run("Register user", func(t *testing.T) {
+		userCopy := user
+		mockDAL.EXPECT().CreateUser(gomock.Any()).Return(&userCopy, nil)
 
-	// httpHandler, router, _ := getTestRouter(t, mockDAL)
-	// router.POST("/register", httpHandler.RegisterHandler)
+		userJson, err := json.Marshal(&user)
+		assert.NoError(t, err)
+		req, err := http.NewRequest("POST", "/register", bytes.NewBuffer(userJson))
+		assert.NoError(t, err)
+		req.Header.Set("Content-Type", "application/json")
 
-	// // t.Run("Register User", func(t *testing.T) {
-	// userCopy := user
+		got := httptest.NewRecorder()
+		router.ServeHTTP(got, req.WithContext(context.Background()))
 
-	// mockDAL.EXPECT().CreateUser(gomock.Any()).Return(&userCopy, nil)
+		assert.Equal(t, http.StatusOK, got.Code)
+	})
 
-	// userJson, _ := json.Marshal(&user)
-	// req, _ := http.NewRequest("POST", "/register", bytes.NewBuffer(userJson))
-	// req.Header.Set("Content-Type", "application/json")
+	t.Run("Register repeat user", func(t *testing.T) {
+		mockDAL.EXPECT().CreateUser(gomock.Any()).Return(nil, errors.New(""))
 
-	// got := httptest.NewRecorder()
-	// router.ServeHTTP(got, req.WithContext(context.Background()))
+		userJson, err := json.Marshal(&user)
+		assert.NoError(t, err)
+		req, err := http.NewRequest("POST", "/register", bytes.NewBuffer(userJson))
+		assert.NoError(t, err)
+		req.Header.Set("Content-Type", "application/json")
 
-	// assert.Equal(t, http.StatusOK, got.Code)
+		got := httptest.NewRecorder()
+		router.ServeHTTP(got, req.WithContext(context.Background()))
 
-	// })
-
-	// t.Run("Register Repeat User", func(t *testing.T) {
-	// 	userCopy := user
-
-	// 	mockDAL.EXPECT().CreateUser(gomock.Any()).Return(&userCopy, nil)
-
-	// 	userJson, _ := json.Marshal(&user)
-	// 	req, _ := http.NewRequest("POST", "/register", bytes.NewBuffer(userJson))
-	// 	req.Header.Set("Content-Type", "application/json")
-
-	// 	got := httptest.NewRecorder()
-	// 	router.ServeHTTP(got, req.WithContext(context.Background()))
-
-	// 	assert.Equal(t, http.StatusOK, got.Code)
-	// userCopy := user
-
-	// mockDAL.EXPECT().CreateUser(gomock.Any()).Return(&userCopy, nil)
-
-	// userJson, _ := json.Marshal(&user)
-	// req, _ := http.NewRequest("POST", "/register", bytes.NewBuffer(userJson))
-	// req.Header.Set("Content-Type", "application/json")
-
-	// got := httptest.NewRecorder()
-	// router.ServeHTTP(got, req.WithContext(context.Background()))
-
-	// mockDAL.EXPECT().CreateUser(gomock.Any()).Return(nil, errors.New(""))
-
-	// req, _ = http.NewRequest("POST", "/register", bytes.NewBuffer(userJson))
-	// req.Header.Set("Content-Type", "application/json")
-
-	// got = httptest.NewRecorder()
-	// router.ServeHTTP(got, req.WithContext(context.Background()))
-
-	// assert.Equal(t, http.StatusBadRequest, got.Code)
-	// })
+		assert.Equal(t, http.StatusBadRequest, got.Code)
+	})
 }
 
 func TestUserLogin(t *testing.T) {
-	// ctrl := gomock.NewController(t)
-	// defer ctrl.Finish()
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
 
-	// mockDAL := mocks.NewMockDal(ctrl)
+	mockDAL := mocks.NewMockDal(ctrl)
+	httpHandler, router, _ := getTestRouter(t, mockDAL)
+	router.POST("/login", httpHandler.LoginHandler)
 
-	// mockDAL.EXPECT().CheckUser(gomock.Any(), gomock.Any()).Return(true, nil)
+	t.Run("Test user login", func(t *testing.T) {
+		mockDAL.EXPECT().CheckUser(gomock.Any(), gomock.Any()).Return(true, nil)
 
-	// httpHandler, router, _ := getTestRouter(t, mockDAL)
-	// router.POST("/login", httpHandler.LoginHandler)
+		user := &model.User{
+			Username: "TestUser1",
+			Password: "TestUserPass1",
+		}
+		userJson, err := json.Marshal(user)
+		assert.NoError(t, err)
 
-	// user := &model.User{
-	// 	Username: "TestUser",
-	// 	Password: "TestUser",
-	// }
-	// userJson, err := json.Marshal(user)
-	// assert.NoError(t, err)
+		req, err := http.NewRequest("POST", "/login", bytes.NewBuffer(userJson))
+		assert.NoError(t, err)
 
-	// req, err := http.NewRequest("POST", "/login", bytes.NewBuffer(userJson))
-	// assert.NoError(t, err)
+		got := httptest.NewRecorder()
 
-	// recorder := httptest.NewRecorder()
+		router.ServeHTTP(got, req)
 
-	// router.ServeHTTP(recorder, req)
+		assert.Equal(t, http.StatusOK, got.Code)
+	})
 
-	// assert.Equal(t, http.StatusOK, recorder.Code)
+	t.Run("Test unregistered user login", func(t *testing.T) {
+
+		mockDAL.EXPECT().CheckUser(gomock.Any(), gomock.Any()).Return(false, nil)
+
+		user := &model.User{
+			Username: "TestUser99",
+			Password: "TestUserPass99",
+		}
+		userJson, err := json.Marshal(user)
+		assert.NoError(t, err)
+
+		req, err := http.NewRequest("POST", "/login", bytes.NewBuffer(userJson))
+		assert.NoError(t, err)
+
+		got := httptest.NewRecorder()
+
+		router.ServeHTTP(got, req)
+
+		assert.Equal(t, http.StatusUnauthorized, got.Code)
+	})
 }

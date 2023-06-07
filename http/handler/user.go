@@ -28,7 +28,7 @@ func (h *HandlerStruct) RegisterHandler(c *gin.Context) {
 
 	if _, err := h.svc.CreateUser(ctx, &user); err != nil {
 		logger.Errorln(err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
