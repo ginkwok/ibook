@@ -16,7 +16,7 @@ func (h *HandlerStruct) AdminGetAllSeatsOfRoomHandler(c *gin.Context) {
 	ctx := c.Request.Context()
 	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
 
-	_, ok := c.Get("username")
+	_, ok := c.Get(util.JWT_USERNAME)
 	if !ok {
 		err := errors.New("invalid credentials")
 		logger.Errorln(err)
@@ -52,7 +52,7 @@ func (h *HandlerStruct) AdminCreateSeatHandler(c *gin.Context) {
 	ctx := c.Request.Context()
 	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
 
-	_, ok := c.Get("username")
+	_, ok := c.Get(util.JWT_USERNAME)
 	if !ok {
 		err := errors.New("invalid credentials")
 		logger.Errorln(err)
@@ -98,7 +98,7 @@ func (h *HandlerStruct) AdminCreateSeatsHandler(c *gin.Context) {
 	ctx := c.Request.Context()
 	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
 
-	_, ok := c.Get("username")
+	_, ok := c.Get(util.JWT_USERNAME)
 	if !ok {
 		err := errors.New("invalid credentials")
 		logger.Errorln(err)
@@ -146,7 +146,7 @@ func (h *HandlerStruct) AdminDeleteSeatHandler(c *gin.Context) {
 	ctx := c.Request.Context()
 	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
 
-	_, ok := c.Get("username")
+	_, ok := c.Get(util.JWT_USERNAME)
 	if !ok {
 		err := errors.New("invalid credentials")
 		logger.Errorln(err)
@@ -196,7 +196,7 @@ func (h *HandlerStruct) AdminGetSeatByIDHandler(c *gin.Context) {
 	ctx := c.Request.Context()
 	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
 
-	_, ok := c.Get("username")
+	_, ok := c.Get(util.JWT_USERNAME)
 	if !ok {
 		err := errors.New("invalid credentials")
 		logger.Errorln(err)
@@ -246,7 +246,7 @@ func (h *HandlerStruct) AdminUpdateSeatHandler(c *gin.Context) {
 	ctx := c.Request.Context()
 	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
 
-	_, ok := c.Get("username")
+	_, ok := c.Get(util.JWT_USERNAME)
 	if !ok {
 		err := errors.New("invalid credentials")
 		logger.Errorln(err)
@@ -305,7 +305,7 @@ func (h *HandlerStruct) GetAllSeatsOfRoomHandler(c *gin.Context) {
 	ctx := c.Request.Context()
 	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
 
-	_, ok := c.Get("username")
+	_, ok := c.Get(util.JWT_USERNAME)
 	if !ok {
 		err := errors.New("invalid credentials")
 		logger.Errorln(err)

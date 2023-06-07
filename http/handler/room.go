@@ -16,7 +16,7 @@ func (h *HandlerStruct) AdminGetAllRoomsHandler(c *gin.Context) {
 	ctx := c.Request.Context()
 	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
 
-	_, ok := c.Get("username")
+	_, ok := c.Get(util.JWT_USERNAME)
 	if !ok {
 		err := errors.New("invalid credentials")
 		logger.Errorln(err)
@@ -38,7 +38,7 @@ func (h *HandlerStruct) AdminCreateRoomHandler(c *gin.Context) {
 	ctx := c.Request.Context()
 	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
 
-	_, ok := c.Get("username")
+	_, ok := c.Get(util.JWT_USERNAME)
 	if !ok {
 		err := errors.New("invalid credentials")
 		logger.Errorln(err)
@@ -69,7 +69,7 @@ func (h *HandlerStruct) AdminDeleteRoomHandler(c *gin.Context) {
 	ctx := c.Request.Context()
 	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
 
-	_, ok := c.Get("username")
+	_, ok := c.Get(util.JWT_USERNAME)
 	if !ok {
 		err := errors.New("invalid credentials")
 		logger.Errorln(err)
@@ -105,7 +105,7 @@ func (h *HandlerStruct) AdminGetRoomByIDHandler(c *gin.Context) {
 	ctx := c.Request.Context()
 	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
 
-	_, ok := c.Get("username")
+	_, ok := c.Get(util.JWT_USERNAME)
 	if !ok {
 		err := errors.New("invalid credentials")
 		logger.Errorln(err)
@@ -141,7 +141,7 @@ func (h *HandlerStruct) AdminUpdateRoomHandler(c *gin.Context) {
 	ctx := c.Request.Context()
 	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
 
-	_, ok := c.Get("username")
+	_, ok := c.Get(util.JWT_USERNAME)
 	if !ok {
 		err := errors.New("invalid credentials")
 		logger.Errorln(err)
@@ -187,7 +187,7 @@ func (h *HandlerStruct) GetAllRoomsHandler(c *gin.Context) {
 	ctx := c.Request.Context()
 	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
 
-	_, ok := c.Get("username")
+	_, ok := c.Get(util.JWT_USERNAME)
 	if !ok {
 		err := errors.New("invalid credentials")
 		logger.Errorln(err)

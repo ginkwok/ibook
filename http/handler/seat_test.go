@@ -13,6 +13,7 @@ import (
 	"github.com/ginkwok/ibook/dal/mocks"
 	"github.com/ginkwok/ibook/http/middleware"
 	"github.com/ginkwok/ibook/model"
+	"github.com/ginkwok/ibook/util"
 )
 
 func TestAdminGetAllSeatsOfRoomHandler(t *testing.T) {
@@ -52,7 +53,7 @@ func TestAdminGetAllSeatsOfRoomHandler(t *testing.T) {
 	req, err := http.NewRequest("GET", "/admin/rooms/1/seats", nil)
 	assert.NoError(t, err)
 
-	req.Header.Set("Authorization", "Bearer "+token)
+	req.Header.Set(util.HTTP_HAED_AUTH, util.HTTP_HAED_AUTH_BEAR+token)
 
 	recorder := httptest.NewRecorder()
 
@@ -107,7 +108,7 @@ func TestAdminCreateSeatsHandler(t *testing.T) {
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Bearer "+token)
+	req.Header.Set(util.HTTP_HAED_AUTH, util.HTTP_HAED_AUTH_BEAR+token)
 
 	recorder := httptest.NewRecorder()
 	router.ServeHTTP(recorder, req)
@@ -128,7 +129,7 @@ func TestAdminDeleteSeatHandler(t *testing.T) {
 
 	req, err := http.NewRequest("DELETE", "/admin/rooms/1/seats/1", nil)
 	assert.NoError(t, err)
-	req.Header.Set("Authorization", "Bearer "+token)
+	req.Header.Set(util.HTTP_HAED_AUTH, util.HTTP_HAED_AUTH_BEAR+token)
 
 	recorder := httptest.NewRecorder()
 
@@ -158,7 +159,7 @@ func TestAdminGetSeatByIDHandler(t *testing.T) {
 	req, err := http.NewRequest("GET", "/admin/rooms/1/seats/1", nil)
 	assert.NoError(t, err)
 
-	req.Header.Set("Authorization", "Bearer "+token)
+	req.Header.Set(util.HTTP_HAED_AUTH, util.HTTP_HAED_AUTH_BEAR+token)
 
 	recorder := httptest.NewRecorder()
 
@@ -199,7 +200,7 @@ func TestAdminUpdateSeatHandler(t *testing.T) {
 	req, err := http.NewRequest("PATCH", "/admin/rooms/1/seats/1", bytes.NewBuffer(reqBody))
 	assert.NoError(t, err)
 
-	req.Header.Set("Authorization", "Bearer "+token)
+	req.Header.Set(util.HTTP_HAED_AUTH, util.HTTP_HAED_AUTH_BEAR+token)
 
 	recorder := httptest.NewRecorder()
 
@@ -251,7 +252,7 @@ func TestGetAllSeatsOfRoomHandler(t *testing.T) {
 	req, err := http.NewRequest("GET", "/rooms/1/seats", nil)
 	assert.NoError(t, err)
 
-	req.Header.Set("Authorization", "Bearer "+token)
+	req.Header.Set(util.HTTP_HAED_AUTH, util.HTTP_HAED_AUTH_BEAR+token)
 
 	recorder := httptest.NewRecorder()
 

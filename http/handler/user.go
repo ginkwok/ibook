@@ -94,8 +94,8 @@ func (h *HandlerStruct) GenerateToken(ctx context.Context, username string) (str
 	logger := ctx.Value(util.LOGGER_KEY).(*zap.SugaredLogger)
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"username": username,
-		"exp":      time.Now().Add(time.Hour * 24).Unix(),
+		util.JWT_USERNAME: username,
+		"exp":             time.Now().Add(time.Hour * 24).Unix(),
 	})
 	tokenString, err := token.SignedString([]byte(viper.GetString("jwt.key")))
 	if err != nil {

@@ -26,3 +26,12 @@ var (
 	NoticeAfterStart  = `Dear user, Your seat reservation has arrived at the start time. Please signin promptly.`
 	NoticeCancel      = "Dear user, your seat reservation has exceeded the start time by 30 minutes and has not been signed in. The system has automatically cancelled the reservation."
 )
+
+const (
+	HTTP_HAED_AUTH      = "Authorization"
+	HTTP_HAED_AUTH_BEAR = "Bearer "
+)
+
+const (
+	JWT_USERNAME = "username"
+)

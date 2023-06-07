@@ -40,7 +40,7 @@ func TestAdminGetResvsBySeatHandler(t *testing.T) {
 	req, err := http.NewRequest("GET", "/admin/rooms/1/seats/1/reservations", nil)
 	assert.NoError(t, err)
 
-	req.Header.Set("Authorization", "Bearer "+token)
+	req.Header.Set(util.HTTP_HAED_AUTH, util.HTTP_HAED_AUTH_BEAR+token)
 
 	recorder := httptest.NewRecorder()
 
@@ -85,7 +85,7 @@ func TestAdminCancelResvHandler(t *testing.T) {
 	req, err := http.NewRequest("PATCH", "/admin/rooms/1/seats/1/reservations/1", nil)
 	assert.NoError(t, err)
 
-	req.Header.Set("Authorization", "Bearer "+token)
+	req.Header.Set(util.HTTP_HAED_AUTH, util.HTTP_HAED_AUTH_BEAR+token)
 
 	recorder := httptest.NewRecorder()
 
@@ -123,7 +123,7 @@ func TestGetResvsByUserHandler(t *testing.T) {
 	req, err := http.NewRequest("GET", "/reservations", nil)
 	assert.NoError(t, err)
 
-	req.Header.Set("Authorization", "Bearer "+token)
+	req.Header.Set(util.HTTP_HAED_AUTH, util.HTTP_HAED_AUTH_BEAR+token)
 
 	recorder := httptest.NewRecorder()
 
@@ -190,7 +190,7 @@ func TestCreateResvHandler(t *testing.T) {
 		req, err := http.NewRequest("POST", "/reservations", bytes.NewBuffer(resvJSON))
 		assert.NoError(t, err)
 		req.Header.Set("Content-Type", "application/json")
-		req.Header.Set("Authorization", "Bearer "+token)
+		req.Header.Set(util.HTTP_HAED_AUTH, util.HTTP_HAED_AUTH_BEAR+token)
 
 		recorder := httptest.NewRecorder()
 		router.ServeHTTP(recorder, req)
@@ -239,7 +239,7 @@ func TestCancelResvHandler(t *testing.T) {
 	req, err := http.NewRequest("PATCH", "/reservations/1/cancel", nil)
 	assert.NoError(t, err)
 
-	req.Header.Set("Authorization", "Bearer "+token)
+	req.Header.Set(util.HTTP_HAED_AUTH, util.HTTP_HAED_AUTH_BEAR+token)
 
 	recorder := httptest.NewRecorder()
 
@@ -294,7 +294,7 @@ func TestSigninResvHandler(t *testing.T) {
 	req, err := http.NewRequest("PATCH", "/reservations/1/signin", nil)
 	assert.NoError(t, err)
 
-	req.Header.Set("Authorization", "Bearer "+token)
+	req.Header.Set(util.HTTP_HAED_AUTH, util.HTTP_HAED_AUTH_BEAR+token)
 
 	recorder := httptest.NewRecorder()
 
@@ -350,7 +350,7 @@ func TestSignoutResvHandler(t *testing.T) {
 	req, err := http.NewRequest("PATCH", "/reservations/1/signout", nil)
 	assert.NoError(t, err)
 
-	req.Header.Set("Authorization", "Bearer "+token)
+	req.Header.Set(util.HTTP_HAED_AUTH, util.HTTP_HAED_AUTH_BEAR+token)
 
 	recorder := httptest.NewRecorder()
 

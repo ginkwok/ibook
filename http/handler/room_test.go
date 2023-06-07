@@ -14,6 +14,7 @@ import (
 	"github.com/ginkwok/ibook/dal/mocks"
 	"github.com/ginkwok/ibook/http/middleware"
 	"github.com/ginkwok/ibook/model"
+	"github.com/ginkwok/ibook/util"
 )
 
 func TestAdminGetAllRoomsHandler(t *testing.T) {
@@ -63,7 +64,7 @@ func TestAdminGetAllRoomsHandler(t *testing.T) {
 	req, err := http.NewRequest("GET", "/admin/rooms", nil)
 	assert.NoError(t, err)
 
-	req.Header.Set("Authorization", "Bearer "+token)
+	req.Header.Set(util.HTTP_HAED_AUTH, util.HTTP_HAED_AUTH_BEAR+token)
 
 	recorder := httptest.NewRecorder()
 
@@ -131,7 +132,7 @@ func TestCreateRoomHandler(t *testing.T) {
 		roomJSON, _ := json.Marshal(room)
 		req, _ := http.NewRequest("POST", "/admin/rooms", bytes.NewBuffer(roomJSON))
 		req.Header.Set("Content-Type", "application/json")
-		req.Header.Set("Authorization", "Bearer "+token)
+		req.Header.Set(util.HTTP_HAED_AUTH, util.HTTP_HAED_AUTH_BEAR+token)
 
 		w := httptest.NewRecorder()
 		router.ServeHTTP(w, req.WithContext(context.Background()))
@@ -157,7 +158,7 @@ func TestAdminDeleteRoomHandler(t *testing.T) {
 	req, err := http.NewRequest("DELETE", "/admin/rooms/1", nil)
 	assert.NoError(t, err)
 
-	req.Header.Set("Authorization", "Bearer "+token)
+	req.Header.Set(util.HTTP_HAED_AUTH, util.HTTP_HAED_AUTH_BEAR+token)
 
 	recorder := httptest.NewRecorder()
 
@@ -181,7 +182,7 @@ func TestAdminGetRoomByIDHandler(t *testing.T) {
 	req, err := http.NewRequest("GET", "/admin/rooms/1", nil)
 	assert.NoError(t, err)
 
-	req.Header.Set("Authorization", "Bearer "+token)
+	req.Header.Set(util.HTTP_HAED_AUTH, util.HTTP_HAED_AUTH_BEAR+token)
 
 	recorder := httptest.NewRecorder()
 
@@ -225,7 +226,7 @@ func TestAdminUpdateRoomHandler(t *testing.T) {
 	req, err := http.NewRequest("PATCH", "/admin/rooms/1", bytes.NewBuffer(reqBody))
 	assert.NoError(t, err)
 
-	req.Header.Set("Authorization", "Bearer "+token)
+	req.Header.Set(util.HTTP_HAED_AUTH, util.HTTP_HAED_AUTH_BEAR+token)
 
 	recorder := httptest.NewRecorder()
 
@@ -287,7 +288,7 @@ func TestGetAllRoomsHandler(t *testing.T) {
 	req, err := http.NewRequest("GET", "/rooms", nil)
 	assert.NoError(t, err)
 
-	req.Header.Set("Authorization", "Bearer "+token)
+	req.Header.Set(util.HTTP_HAED_AUTH, util.HTTP_HAED_AUTH_BEAR+token)
 
 	recorder := httptest.NewRecorder()
 
