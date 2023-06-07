@@ -17,7 +17,7 @@ log:
   output: stdout
   # output: file
   dir: ./logs
-  file: app.log.json
+  file: app.log
 
 jwt:
   key: secret
