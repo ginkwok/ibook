@@ -1,6 +1,10 @@
 # ibook
 
 ```shell
+go test -v ./test/
+```
+
+```shell
 docker build -t ibook-backend:latest .
 ```
 
