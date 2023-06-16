@@ -24,7 +24,6 @@ func TestCreateReservation(t *testing.T) {
 
 	mockDAL := mocks.NewMockDal(ctrl)
 	httpHandler, router, token := getTestRouter(t, mockDAL)
-
 	router.POST("/reservations", middleware.AuthMiddleware(), httpHandler.CreateResvHandler)
 	t.Run("Test create reservation", func(t *testing.T) {
 		time1, err := time.Parse(time.RFC3339, "2022-05-30T09:00:00Z")
@@ -167,7 +166,6 @@ func TestCancelReservation(t *testing.T) {
 			Status:   util.ResvStatusUnsignin,
 		}
 		mockDAL.EXPECT().GetResvByID(gomock.Any()).Return(oldResv, nil).Times(2)
-
 		expectResv := &model.Reservation{
 			ID:       1,
 			Username: "TestUser1",
@@ -176,38 +174,25 @@ func TestCancelReservation(t *testing.T) {
 			Status:   util.ResvStatusCancelled,
 		}
 		mockDAL.EXPECT().UpdateResv(gomock.Any()).Return(expectResv, nil).AnyTimes()
-
 		req, err := http.NewRequest("PATCH", "/reservations/1/cancel", nil)
 		assert.NoError(t, err)
-
 		req.Header.Set(util.HTTP_HAED_AUTH, util.HTTP_HAED_AUTH_BEAR+token)
-
 		recorder := httptest.NewRecorder()
-
 		router.ServeHTTP(recorder, req)
-
 		assert.Equal(t, http.StatusOK, recorder.Code)
-
 		var responseResv *model.Reservation
 		err = json.Unmarshal(recorder.Body.Bytes(), &responseResv)
 		assert.NoError(t, err)
-
 		assert.Equal(t, expectResv, responseResv)
 	})
 
 	t.Run("Test cancel reservation that don't exist", func(t *testing.T) {
-
 		mockDAL.EXPECT().GetResvByID(gomock.Any()).Return(nil, errors.New(""))
-
 		req, err := http.NewRequest("PATCH", "/reservations/1/cancel", nil)
 		assert.NoError(t, err)
-
 		req.Header.Set(util.HTTP_HAED_AUTH, util.HTTP_HAED_AUTH_BEAR+token)
-
 		recorder := httptest.NewRecorder()
-
 		router.ServeHTTP(recorder, req)
-
 		assert.Equal(t, http.StatusBadRequest, recorder.Code)
 	})
 
@@ -222,30 +207,72 @@ func TestCancelReservation(t *testing.T) {
 			ResvStartTime: &resvStartTime,
 		}
 		mockDAL.EXPECT().GetResvByID(gomock.Any()).Return(oldResv, nil).Times(1)
-		mockDAL.EXPECT().UpdateResv(gomock.Any()).Return(nil, errors.New("")).AnyTimes()
 		mockDAL.EXPECT().GetResvByID(gomock.Any()).Return(nil, errors.New("")).Times(1)
-
 		req, err := http.NewRequest("PATCH", "/reservations/1/cancel", nil)
 		assert.NoError(t, err)
-
 		req.Header.Set(util.HTTP_HAED_AUTH, util.HTTP_HAED_AUTH_BEAR+token)
-
 		recorder := httptest.NewRecorder()
-
 		router.ServeHTTP(recorder, req)
-
 		assert.Equal(t, http.StatusBadRequest, recorder.Code)
 	})
 }
 
 func TestGetReservationHistory(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
 
+	mockDAL := mocks.NewMockDal(ctrl)
+	httpHandler, router, token := getTestRouter(t, mockDAL)
+	router.GET("/reservations", middleware.AuthMiddleware(), httpHandler.GetResvsByUserHandler)
+
+	t.Run("Test get reservation history", func(t *testing.T) {
+		expectResvs := []*model.Reservation{{
+			ID:       1,
+			Username: "TestUser1",
+			RoomID:   1,
+			SeatID:   1,
+			Status:   util.ResvStatusSignined,
+		}}
+		mockDAL.EXPECT().GetResvsByUser(gomock.Any()).Return(expectResvs, nil)
+		req, err := http.NewRequest("GET", "/reservations", nil)
+		assert.NoError(t, err)
+		req.Header.Set(util.HTTP_HAED_AUTH, util.HTTP_HAED_AUTH_BEAR+token)
+		recorder := httptest.NewRecorder()
+		router.ServeHTTP(recorder, req)
+		assert.Equal(t, http.StatusOK, recorder.Code)
+		var responseResvs []*model.Reservation
+		err = json.Unmarshal(recorder.Body.Bytes(), &responseResvs)
+		assert.NoError(t, err)
+		assert.Equal(t, expectResvs, responseResvs)
+	})
 }
 
 func TestGetSeatReservation(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
 
-}
+	mockDAL := mocks.NewMockDal(ctrl)
+	httpHandler, router, token := getTestRouter(t, mockDAL)
+	router.GET("/admin/rooms/:room_id/seats/:seat_id/reservations", middleware.AuthMiddleware(), httpHandler.AdminGetResvsBySeatHandler)
 
-func TestCancelSeatReservation(t *testing.T) {
-
+	t.Run("Test get reservation of seat", func(t *testing.T) {
+		expectResvs := []*model.Reservation{{
+			ID:       1,
+			Username: "TestUser1",
+			RoomID:   1,
+			SeatID:   1,
+			Status:   util.ResvStatusUnsignin,
+		}}
+		mockDAL.EXPECT().GetResvsBySeat(gomock.Any()).Return(expectResvs, nil)
+		req, err := http.NewRequest("GET", "/admin/rooms/1/seats/1/reservations", nil)
+		assert.NoError(t, err)
+		req.Header.Set(util.HTTP_HAED_AUTH, util.HTTP_HAED_AUTH_BEAR+token)
+		recorder := httptest.NewRecorder()
+		router.ServeHTTP(recorder, req)
+		assert.Equal(t, http.StatusOK, recorder.Code)
+		var responseResvs []*model.Reservation
+		err = json.Unmarshal(recorder.Body.Bytes(), &responseResvs)
+		assert.NoError(t, err)
+		assert.Equal(t, expectResvs, responseResvs)
+	})
 }
