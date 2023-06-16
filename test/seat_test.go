@@ -247,8 +247,54 @@ func TestUpdateSeat(t *testing.T) {
 }
 
 func TestSearchSeat(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockDAL := mocks.NewMockDal(ctrl)
+	httpHandler, router, token := getTestRouter(t, mockDAL)
+	router.GET("/search", middleware.AuthMiddleware(), httpHandler.SearchSeatsHandler)
+
 	t.Run("Test search seat", func(t *testing.T) {
+		expectSeats := []*model.Seat{
+			{
+				RoomID:      1,
+				Number:      "Test-R1-S1",
+				Location:    "test location 1",
+				IsAvaliable: true,
+			},
+			{
+				RoomID:      1,
+				Number:      "Test-R1-S2",
+				Location:    "test location 2",
+				IsAvaliable: true,
+			},
+			{
+				RoomID:      1,
+				Number:      "Test-R1-S3",
+				Location:    "test location 3",
+				IsAvaliable: true,
+			},
+		}
+		mockDAL.EXPECT().SearchSeats(gomock.Any(), gomock.Any()).Return(expectSeats, nil)
+		condition := "is_avaliable=true&room_id=1"
+		req, err := http.NewRequest("GET", "/search?"+condition, nil)
+		assert.NoError(t, err)
+		req.Header.Set(util.HTTP_HAED_AUTH, util.HTTP_HAED_AUTH_BEAR+token)
+		recorder := httptest.NewRecorder()
+		router.ServeHTTP(recorder, req)
+		assert.Equal(t, http.StatusOK, recorder.Code)
+		var response []*model.Seat
+		err = json.Unmarshal(recorder.Body.Bytes(), &response)
+		assert.NoError(t, err)
+		assert.Equal(t, expectSeats, response)
 	})
+
 	t.Run("Test search seat with empty query", func(t *testing.T) {
+		req, err := http.NewRequest("GET", "/search", nil)
+		assert.NoError(t, err)
+		req.Header.Set(util.HTTP_HAED_AUTH, util.HTTP_HAED_AUTH_BEAR+token)
+		recorder := httptest.NewRecorder()
+		router.ServeHTTP(recorder, req)
+		assert.Equal(t, http.StatusBadRequest, recorder.Code)
 	})
 }
