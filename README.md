@@ -1,4 +1,4 @@
-# ibook
+# iBook Backend
 
 ```shell
 go test -v ./test/
